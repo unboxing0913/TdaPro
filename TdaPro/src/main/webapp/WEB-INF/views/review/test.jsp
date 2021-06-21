@@ -98,7 +98,7 @@ button:hover {
 <body>
 
 <form>
-  <h3 class="h-txt">회원가입</h3>
+  <h3 class="h-txt">로그인</h3>
   <label>
     <p class="label-txt">아이디 입력</p>
     <input type="text" class="input" placeholder="Your ID" required autofocus>

@@ -15,8 +15,8 @@
         <property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@localhost:1521:XE"/>
     	<!-- <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
         <property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:XE"/> -->
-        <property name="username" value="book_ex"/>
-        <property name="password" value="123123"/>
+        <property name="username" value="unboxing"/>
+        <property name="password" value="0913"/>
      </bean>
 	
 	<!--HikariCP Configration -->
@@ -31,5 +31,8 @@
 	
 	<!-- Mapper -->
 	<mybatis-spring:scan base-package="org.unboxing.mapper"/>
+	
+	<!-- @service 스캔  -->
+	<context:component-scan base-package="org.unboxing.service"/>
 	
 </beans>

@@ -20,15 +20,15 @@ public class JDBCTests {
 			 }
 			}
 			
-			//jdbc 연결테스트
+			
 			@Test
 			public void testConnection() {
 			
 				try (Connection con =
 						DriverManager.getConnection(
 								"jdbc:oracle:thin:@localhost:1521:XE",
-								"unboxing", /*아이디*/
-								"0913" /*비밀번호*/ )){
+								"unboxing", 
+								"0913" )){
 					
 					log.info(con);
 				}catch(Exception e) {

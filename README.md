@@ -101,3 +101,40 @@ git revert를 했지만 잘 사용하지못하고 pom.xml이 없어지는 현상
 현재 View 페이지
 공지사항(입력,수정/삭제,목록) , 로그인 , 회원가입 , 견적게시판(입력,수정/삭제,목록) , 후기게시판(입력,수정/삭제,목록) 진행
 추후에 디자인적으로 추가될수있음
+
+
+■■■■■■■■■■■■■■■2021-06-21■■■■■■■■■■■■■■■
+
+
+JSON데이터를 만들어내는 용도인 jackson-databind 라이브러리 추가
+
+AOP를 이용한 방식으로 ControllerAdvice를 사용해 예외페이지컨트롤러 작성 (예외페이지 View 작성)
+
+시퀀스 -> ROWNUM 방식사용할예정
+
+데이터베이스 review_board테이블 작성
+create sequence rv_seq_board;
+
+create table review_board(
+    bno number(10,0),
+    title varchar2(200) not null,
+    content varchar2(2000) not null,
+    writer varchar2(50) not null,
+    regdate date default sysdate,
+    updatedate date default sysdate
+    );
+
+alter table review_board add constraint pk_review_board primary key(bno);
+
+
+review_board 테이블 반영하는 ReviewVO 클래스 생성
+ReviewMapper 인터페이스 생성
+Mapper.xml 작성하기전 ReviewMapperTests 클래스만든후 JUnit 으로 테스트 
+테스트 성공후 src/main/resources -> org/unboxing/mapper/ReviewMapper.xml 생성
+
+영속영역의 CRUD 구현 (ReviewMapper)
+
+JUnit 테스트코드 작성으로 동작테스트
+
+깃허브 연동후 커밋을했는데 워크트리에 안보이는현상발견 내일 한번 찾아볼예정 version 2 까지 
+

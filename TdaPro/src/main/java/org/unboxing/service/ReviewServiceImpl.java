@@ -19,7 +19,8 @@ public class ReviewServiceImpl implements ReviewService{
 	
 	@Override
 	public List<ReviewVO> getList() {
-		return null;
+		log.info("목록");
+		return mapper.getList();
 	}
 
 	@Override
@@ -30,20 +31,20 @@ public class ReviewServiceImpl implements ReviewService{
 
 	@Override
 	public ReviewVO get(Long bno) {
-		// TODO Auto-generated method stub
-		return null;
+		log.info("조회 ---> "+bno);
+		return mapper.read(bno);
 	}
 
 	@Override
 	public boolean modify(ReviewVO board) {
-		// TODO Auto-generated method stub
-		return false;
+		log.info("수정 ---> "+board);
+		return mapper.update(board) == 1;
 	}
 
 	@Override
 	public boolean remove(Long bno) {
-		// TODO Auto-generated method stub
-		return false;
+		log.info("삭제 ---> "+bno);
+		return mapper.delete(bno) == 1;
 	}
 
 }

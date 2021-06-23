@@ -1,10 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<!-- header -->
 <%@include file="../includes/header.jsp" %>
 
+
+<!-- register body -->
 <div class="row">
 	<div class="col-lg-12">
-		<h1>Review Register</h1>
+		<h1>Review Register Page</h1>
 		<hr>
 	</div>
 </div>
@@ -32,4 +38,7 @@
 	</form>
 	
 	</div>
+	
+	
+<!-- footer -->
 <%@include file="../includes/footer.jsp" %>

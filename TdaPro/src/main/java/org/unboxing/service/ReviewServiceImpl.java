@@ -38,7 +38,7 @@ public class ReviewServiceImpl implements ReviewService{
 	@Override
 	public boolean modify(ReviewVO board) {
 		log.info("수정 ---> "+board);
-		return mapper.update(board) == 1;
+		return mapper.update(board) == 1; //정상적 수정완료시 1값반환 == 연산자를 이용해 t/f 처리
 	}
 
 	@Override

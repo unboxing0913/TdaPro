@@ -113,6 +113,7 @@ AOP를 이용한 방식으로 ControllerAdvice를 사용해 예외페이지컨�
 시퀀스 -> ROWNUM 방식사용할예정
 
 데이터베이스 review_board테이블 작성
+
 create sequence rv_seq_board;
 
 create table review_board(
@@ -130,11 +131,23 @@ alter table review_board add constraint pk_review_board primary key(bno);
 review_board 테이블 반영하는 ReviewVO 클래스 생성
 ReviewMapper 인터페이스 생성
 Mapper.xml 작성하기전 ReviewMapperTests 클래스만든후 JUnit 으로 테스트 
+
 테스트 성공후 src/main/resources -> org/unboxing/mapper/ReviewMapper.xml 생성
 
 영속영역의 CRUD 구현 (ReviewMapper)
 
 JUnit 테스트코드 작성으로 동작테스트
 
-깃허브 연동후 커밋을했는데 워크트리에 안보이는현상발견 내일 한번 찾아볼예정 version 2 까지 
+깃허브 연동후 커밋을했는데 워크트리에 안보이는현상발견 내일 한번 찾아볼예정
 
+
+
+■■■■■■■■■■■■■■■2021-06-22■■■■■■■■■■■■■■■
+
+깃허브 sts push오류 해결 ( 정상적으로 동작 ) 
+
+Review 게시판 비즈니스 계층 구현 (service)
+
+ReviewService 인터페이스 구현 ReviewServiceImpl 구조설정 완료
+
+JUnit 테스트 코드 작성으로 동작테스트

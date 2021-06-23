@@ -151,3 +151,77 @@ Review 게시판 비즈니스 계층 구현 (service)
 ReviewService 인터페이스 구현 ReviewServiceImpl 구조설정 완료
 
 JUnit 테스트 코드 작성으로 동작테스트
+
+
+
+■■■■■■■■■■■■■■■2021-06-23■■■■■■■■■■■■■■■
+
+프레젠테이션(웹)계층의 CRUD 구현
+
+Review Controller 분석
+
+▶리뷰목록
+URL : /review/list 
+Method : GET
+
+▶리뷰등록
+URL : /review/register
+Method : POST
+Parameter : 모든항목
+From : 입력화면 필요
+URL이동 : 이동
+
+▶리뷰조회
+URL : /review/read
+Mehtod : GET
+Parameter : (ex) bno = 123
+
+▶리뷰삭제
+URL : /review/remove
+Method : POST
+Parameter : bno
+From : 입력화면 필요
+URL이동 : 이동
+
+▶리뷰수정
+URL : /review/modify
+Method : POST
+Parameter : 모든항목
+From : 입력화면 필요
+URL이동 : 이동
+
+
+Review 컨트롤러 작성
+
+JUnit 테스트코드 작성으로 동작테스트
+
+만들어 놓은 Review 페이지의 View 페이지들과 경로 연결
+
+Review list 페이지 전달받은 list로 데이터베이스 내용 테스트 완료
+
+Review resiter페이지 get방식으로 호출 후 post방식으로 전달되어 데이터베이스에 전송되는 테스트 완료
+(한글깨지는 문제는 web.xml의 filter 처리로 해결 ) 
+
+resiter 페이지 등록시 ( Modal 설정 )
+
+list 페이지에서 resiter 페이지로 이동할수있는 등록 버튼 생성 
+등록버튼 스크립트 사용으로 클릭시 동작 설정 
+
+조회페이지 Controller에서 받아온 board값으로 value설정 ( get페이지에서 수정불가하게 readonly="readonly" 읽기전용설정 )
+
+조회페이지 수정버튼 클릭시 /review/get?bno=? 형식으로 게시물 번호를 피라미터로 전달받게함
+
+목록페이지에서 조회페이지 이동시 <a>태그로 이동할수있게 처리
+
+조회페이지에서의 목록페이지로 돌아가는 버튼과 수정버튼 추가
+
+뒤로가기시 실행되는 모달창을 설정하기위해 history객체 사용 스크립트 추가
+
+게시물 수정/삭제처리 페이지 
+
+수정페이지도 get방식( 매핑get과 동일 ) 추가해준뒤 Controller로 전달받은 데이터로 값 수정후 버튼생성
+
+JavaScript를 활용한 수정/삭제/목록 버튼의 동작 추가 (버튼 별 다른 명령)
+
+조회페이지의 form처리 ( 수정/삭제 , 목록 페이지로 보내기위한 script form 처리 ) 
+

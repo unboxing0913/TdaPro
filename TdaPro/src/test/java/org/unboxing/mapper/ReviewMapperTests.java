@@ -1,10 +1,13 @@
 package org.unboxing.mapper;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.unboxing.domain.Criteria;
 import org.unboxing.domain.ReviewVO;
 
 import lombok.Setter;
@@ -20,7 +23,19 @@ public class ReviewMapperTests {
 	
 	@Test
 	public void TestGetList() {
-		mapper.getList().forEach(review -> log.info(review));;
+		mapper.getList().forEach(review -> log.info(review));
+	}
+	
+	@Test
+	public void testPaging() {
+		Criteria cri = new Criteria();
+		
+		//3페이지 test
+		cri.setPageNum(3);
+		cri.setAmount(10);
+		
+		List<ReviewVO> list = mapper.getListWithPaging(cri);
+		list.forEach(board -> log.info(board));
 	}
 	
 	@Test

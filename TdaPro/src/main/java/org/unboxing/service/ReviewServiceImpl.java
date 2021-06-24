@@ -3,6 +3,7 @@ package org.unboxing.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.unboxing.domain.Criteria;
 import org.unboxing.domain.ReviewVO;
 import org.unboxing.mapper.ReviewMapper;
 
@@ -17,11 +18,19 @@ public class ReviewServiceImpl implements ReviewService{
 	//@Setter(onMethod_=@Autowired)  AllArgsConstructor로 사용
 	private ReviewMapper mapper;
 	
+	/*
 	@Override
 	public List<ReviewVO> getList() {
 		log.info("목록");
 		return mapper.getList();
 	}
+	*/
+	@Override
+	public List<ReviewVO> getList(Criteria cri) {
+		log.info("목록처리, 페이징 처리 : " +cri);
+		return mapper.getListWithPaging(cri);
+	}
+	
 
 	@Override
 	public void register(ReviewVO board) {
@@ -46,5 +55,14 @@ public class ReviewServiceImpl implements ReviewService{
 		log.info("삭제 ---> "+bno);
 		return mapper.delete(bno) == 1;
 	}
+
+
+	@Override
+	public int getTotal(Criteria cri) {
+		log.info("전체 데이터 수");
+		return mapper.getTotalCount(cri);
+	}
+
+	
 
 }

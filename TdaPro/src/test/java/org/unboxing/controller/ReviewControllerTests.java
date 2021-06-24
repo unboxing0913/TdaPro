@@ -24,12 +24,22 @@ public class ReviewControllerTests {
 	@Setter(onMethod_=@Autowired)
 	private WebApplicationContext ctx;
 	
-	// 가짜 mvc (테스트용)
+	// Fake mvc (테스트용)
 	private MockMvc mockMvc;
 	
 	@Before
 	public void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+	}
+	
+	
+	//list(page 처리) 테스트
+	@Test
+	public void testListPaging() throws Exception {
+		log.info(mockMvc.perform(MockMvcRequestBuilders.get("/review/list")
+				.param("pageNum", "2")
+				.param("amount", "50"))
+				.andReturn().getModelAndView().getModelMap());
 	}
 	
 	

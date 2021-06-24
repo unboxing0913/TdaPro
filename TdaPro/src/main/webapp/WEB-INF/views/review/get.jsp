@@ -47,6 +47,10 @@
 		
 		<form id='operForm' action="/review/modify" method="get">
 			<input type="hidden" id='bno' name='bno' value='<c:out value="${board.bno}"/>'>
+			
+			<!-- 페이지정보인 pageNum,amount (/get매핑 컨트롤러 매개변수로 받아옴) -->
+			<input type="hidden"  name='pageNum' value='<c:out value="${cri.pageNum}"/>'>
+			<input type="hidden"  name='amount' value='<c:out value="${cri.amount}"/>'>
 		</form>
 	
 </div>

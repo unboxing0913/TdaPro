@@ -1,12 +1,14 @@
 package org.unboxing.service;
 
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.unboxing.domain.Criteria;
 import org.unboxing.domain.ReviewVO;
 
 import lombok.Setter;
@@ -42,7 +44,8 @@ public class ReviewServiceTests {
 	//목록 테스트
 	@Test
 	public void testGetList() {
-		service.getList().forEach(board -> log.info(board));
+		//service.getList().forEach(board -> log.info(board));
+		service.getList(new Criteria(2,10)).forEach(board -> log.info(board));
 	}
 	
 	// 1번글 조회 테스트

@@ -2,12 +2,19 @@ package org.unboxing.mapper;
 
 import java.util.List;
 
+import org.unboxing.domain.Criteria;
 import org.unboxing.domain.ReviewVO;
 
 public interface ReviewMapper {
 
 	//@Select("select * from review_board where bno > 0 ")
 	public List<ReviewVO> getList();
+	
+	//Criteria 타입을 피라미터로 사용하는 메서드 (페이징처리)
+	public List<ReviewVO> getListWithPaging(Criteria cri);
+	
+	//전체 데이터개수를 구하기위한 메서드
+	public int getTotalCount(Criteria cri);
 	
 	//Test코드실행시 Lombok의 toString()으로만든 bno변수가 null값으로 비어있음
 	public void insert(ReviewVO board);
@@ -23,4 +30,6 @@ public interface ReviewMapper {
 	
 	//데이터 수정도 마찬가지로 몇개의 데이터를 수정했는지 처리하기위해 int 타입(최종수정시간 : 현재시간)
 	public int update(ReviewVO board);
+	
+	
 }

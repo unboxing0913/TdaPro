@@ -224,4 +224,124 @@ list 페이지에서 resiter 페이지로 이동할수있는 등록 버튼 생�
 JavaScript를 활용한 수정/삭제/목록 버튼의 동작 추가 (버튼 별 다른 명령)
 
 조회페이지의 form처리 ( 수정/삭제 , 목록 페이지로 보내기위한 script form 처리 ) 
+    
+    
+■■■■■■■■■■■■■■■2021-06-24■■■■■■■■■■■■■■■
+
+데이터베이스 페이징처리 
+테이블 재귀 복사를 통해 데이터양 500개 추가
+insert into review_board (bno,title,content,writer)
+(select rv_seq_board.nextval,title,content,writer from review_board);
+
+페이징처리를 위해 order by 를 사용하기보다
+오라클의hint와 index를 사용 (데이터의 양이 많을때 실행시간을 단축시키기위함)
+
+ROWNUM을 사용해 게시글 넘버링을 해줌
+
+10개씩 페이징 처리하기위해 index를 역순으로 rownum번호를 매긴뒤 조건문추가
+
+select
+/*+INDEX_DESC(review_board pk_review_board)*/
+ rownum rn , bno , title , content
+from review_board where rownum <= 10
+
+
+1페이지는 문제없지만 2페이지 처리하는데에서 rownum이 1을포함하지못해 출력되지않는 문제발생 (rownum은 반드시1이 포함)
+-->2페이지는 인라인 뷰로 처리
+
+select 
+bno , title , content
+from(
+select
+/*+INDEX_DESC(review_board pk_review_board)*/
+ rownum rn , bno , title , content
+from review_board where rownum <= 20
+)
+where rn > 10;
+
+
+
+MyBatis와 스프링에서 페이징 처리를위해  domain패키지안에 Criteria 클래스를 작성
+
+ReviewMapper 인터페이스에 페이징 처리 메소드(Criteria타입을 피라미터로받는) 추가
+
+ReviewMapperTests에서 기본값으로 테스트 확인 
+--> mybatis 의 xml안에서 세미콜론(;) 사용해 오류 발생함...
+
+매퍼 xml 페이징처리 부분 수정 (Criteria 클래스의 pageNum , amount 필드값을 가지고 처리하도록) 
+<select id="getListWithPaging" resultType="org.unboxing.domain.ReviewVO">
+<![CDATA[
+select 
+	bno , title , content , writer , regdate , updatedate
+	from(
+		select
+			/*+INDEX_DESC(review_board pk_review_board)*/
+ 			rownum rn , bno , title , content , writer , regdate , updatedate
+			from review_board where rownum <= #{pageNum} * #{amount}
+		)
+	where rn > (#{pageNum}-1) * #{amount}
+]]>
+
+</select>
+
+
+ReviewSerivce 수정 (목록 페이징처리한 매퍼로 수정) --> Service수정시 testService 는 오류가나오기때문에 맞춰서 수정
+ReviewController 또한 페이징처리클래스인 Criteria 를 매개변수로 받을수있도록 수정 -> 컨트롤러 테스트
+
+
+페이징 화면처리를 위한 page(현재) , prev(이전) , next(다음) , startPage(시작번호) , endPage(끝번호)
+
+▶endPage(끝번호) 계산 (페이지번호 10개씩 보인다는 가정)
+this.endPage = (int)(Math.ceil( 페이지번호 / 10.0)) * 10;
+
+▶startPage(시작번호) 계산 (페이지번호 10개씩 보인다는 가정)
+this.startPage = this.endPage - 9;
+
+▶total을 통한endPage 재계산 (끝번호와 한페이지당출력되는 데이터수의 곱이 전체데이터수보다 클때)
+realEnd = (int)(Math.ceil((total * 1.0) / amount) );
+if(realEnd < this.endPage){
+  this.endPage = realEnd;
+}
+
+▶prev(이전) 계산
+this.prev = this.startPage > 1;
+
+▶next(다음) 계산
+this.next = this.endPage < realEnd;
+
+
+페이징 처리를 위한 클래스 설계
+PageDTO 클래스를 만들어 startPage , endPage , prev , next , total , cri 변수를 만들고 계산법을 사용해 값을 계산해줌
+
+ReviewController 클래스의 list 수정 ( pageMaker 라는 이름으로 PageDTO 전달 )
+
+Review list.jsp 안에 page번호 Bootstrap으로 추가 
+
+JavaScript로 페이지 번호 이벤트처리 
+
+get.jsp에서 목록이동버튼 클릭시 1페이지로만 이동하는 증상 페이징 처리 (파라미터 같이전송하기위해 list.jsp 수정)
+---> 제목 눌렀을시 페이지이동하는 <a>태그를 수정해주고 스크립트로 처리
+---> list.jsp 수정후 ReviewController의 /get 매핑부분 수정 ( pageNum과 amount를 받아줄 @ModelAttribute("cri") Criteria cri 매개변수 추가 )
+---> get.jsp 받아온 정보를 form 안의 input 의 hidden타입으로 저장
+
+
+조회 페이지에서 수정 버튼을통해 수정/삭제 페이지 이동시에도 목록으로 이동하는 버튼이 존재하지만 
+/get 매핑에서 /get과 /modify를 같이 처리하기때문에 별도의 처리가 필요없음 (파라미터들은 자동으로 같이전송됨)
+--->전송된 Criteria 의 정보들을 modify.jsp의 form안에 hidden타입의 input 태그로 저장
+--->수정/삭제 처리를 하기위해 ReviewController안의 페이지관련 파라미터 처리해줌 (수정/삭제이후 기존에 보던 페이지로 이동하기위함)
+
+
+수정/삭제 를 취소하고 목록페이지로 이동했을때 form태그의 pageNum과 amount를 제외한 다른내용은 삭제하고 필요한 내용만 추가하기위해
+modify.jsp 의 javaScript부분을 수정
+
+MyBatis에서 전체 데이터 개수 처리 ( 현재는 임시로 123으로 받고있었음 )
+---> ReviewMapper 인터페이스에 getTotalCount 메서드생성 (Criteria를 매개변수로받음)
+---> ReviewMapper.xml 에 total을 구할수있는 SQL문 작성 
+<select id="getTotalCount" resultType="int">
+	select count(*) from review_board where bno > 0
+</select>
+
+---> service에 전체 데이터수를 구하는 서비스생성
+---> ReviewController 이동후 임시로 사용했던 123대신 service 메서드를 사용후 total을 구한뒤 전체데이터수 pageDTO에 담아 전달 (pageMaker)
+     
 

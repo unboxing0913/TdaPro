@@ -38,6 +38,19 @@ public class ReviewMapperTests {
 		list.forEach(board -> log.info(board));
 	}
 	
+	//검색테스트
+	@Test
+	public void testSerach() {
+		Criteria cri = new Criteria();
+		cri.setKeyword("ddd");
+		cri.setType("TC");
+		
+		List<ReviewVO> list = mapper.getListWithPaging(cri);
+		
+		list.forEach(board -> log.info(board));		
+	}
+	
+	
 	@Test
 	public void testInsert() {
 		ReviewVO board = new ReviewVO();

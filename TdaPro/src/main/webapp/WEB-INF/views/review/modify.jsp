@@ -24,6 +24,9 @@
 		<!-- 페이징처리를 위한 hidden타입의 input -->
 		<input type='hidden' name="pageNum" value='<c:out value="${cri.pageNum }"/>'>
 		<input type='hidden' name="amount" value='<c:out value="${cri.amount }"/>'>
+		<!-- 수정/삭제 페이지의 검색 처리 -->
+		<input type="hidden" name="type" value='<c:out value="${cri.type}"/>'>
+    	<input type="hidden" name="keyword" value='<c:out value="${cri.keyword}"/>'>
 		
 		<div class="from-group">
 			<label>게시글 번호</label><input class="form-control" name="bno" readonly="readonly" value='<c:out value="${board.bno}"/>'>
@@ -87,14 +90,23 @@ $(document).ready(function(){
 		
 		if(operation === 'remove'){ 
 			formObj.attr("action","/review/remove"); //삭제
+			
 		}else if(operation === 'list'){
 			formObj.attr("action","/review/list").attr("method","get");
+			
+			//페이징 처리 부분
 			var pageNumTag = $("input[name='pageNum']").clone(); //clone()을 사용해 새로만든 var에 내용을 저장
 			var amountTag = $("input[name='amount']").clone();
+			
+			//검색 처리 부분
+			var typeTag = $("input[name='type']").clone();
+			var keywordTag = $("input[name='keyword']").clone();
 			
 			formObj.empty(); //버튼이 list일때 안의 내용 비우기
 			formObj.append(pageNumTag); // 수정/삭제를 취소한뒤 필요한 pageNum과 amount만을 가지고 돌아감
 			formObj.append(amountTag)
+			formObj.append(typeTag); 
+			formObj.append(keywordTag); 
 		}
 		
 		formObj.submit();  // 수정

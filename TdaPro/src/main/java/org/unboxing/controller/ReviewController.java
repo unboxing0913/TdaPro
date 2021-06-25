@@ -69,7 +69,9 @@ public class ReviewController {
 		model.addAttribute("board",service.get(bno));
 	}
 	
-	
+	/*
+	 * UriComponentsBuilder 사용해 redirect 코드를 간단히 하기위해 주석
+	 * 
 	@PostMapping("/modify")
 	public String modify(ReviewVO board,RedirectAttributes rttr,@ModelAttribute("cri") Criteria cri) {
 		log.info("modify : "+board);
@@ -81,11 +83,32 @@ public class ReviewController {
 		rttr.addAttribute("pageNum",cri.getPageNum());
 		rttr.addAttribute("amount", cri.getAmount());
 		
+		//검색처리
+		rttr.addAttribute("type", cri.getType());
+		rttr.addAttribute("keyword", cri.getKeyword());
+		
 		//수정 작업이후 다시 목록화면으로 이동
 		return "redirect:/review/list";
 	}
+	*/
+	@PostMapping("/modify")
+	public String modify(ReviewVO board,RedirectAttributes rttr,Criteria cri) {
+		log.info("modify : "+board);
+		if(service.modify(board)) {
+			rttr.addFlashAttribute("result","success");
+		}
+		
+		
+		//수정 작업이후 다시 목록화면으로 이동
+		// Criteria 클래스의 getListLink()메서드를 가지고 UriComponentsBuilder 기능으로 url 처리
+		return "redirect:/review/list"+cri.getListLink();
+	}
 	
 	
+	
+	/*
+	 * UriComponentsBuilder 사용해 redirect 코드를 간단히 하기위해 주석
+	 * 
 	@PostMapping("/remove")
 	public String remove(@RequestParam("bno") Long bno,RedirectAttributes rttr,@ModelAttribute("cri") Criteria cri) {
 		log.info("remove Bno : " +bno);
@@ -97,8 +120,29 @@ public class ReviewController {
 		rttr.addAttribute("pageNum",cri.getPageNum());
 		rttr.addAttribute("amount", cri.getAmount());
 		
+		//검색처리
+		rttr.addAttribute("type", cri.getType());
+		rttr.addAttribute("keyword", cri.getKeyword());
+		
 		//삭제 작업이후 다시 목록화면으로 이동
 		return "redirect:/review/list";
 	}
+	*/
+	
+	@PostMapping("/remove")
+	public String remove(@RequestParam("bno") Long bno,RedirectAttributes rttr,Criteria cri) {
+		log.info("remove Bno : " +bno);
+		if(service.remove(bno)) {
+			rttr.addFlashAttribute("result","success");
+		}
+		
+		//삭제 작업이후 다시 목록화면으로 이동
+		// Criteria 클래스의 getListLink()메서드를 가지고 UriComponentsBuilder 기능으로 url 처리
+		return "redirect:/review/list"+cri.getListLink();
+	}
+	
+	
+	
+	
 
 }

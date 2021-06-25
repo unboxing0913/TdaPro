@@ -51,6 +51,10 @@
 			<!-- 페이지정보인 pageNum,amount (/get매핑 컨트롤러 매개변수로 받아옴) -->
 			<input type="hidden"  name='pageNum' value='<c:out value="${cri.pageNum}"/>'>
 			<input type="hidden"  name='amount' value='<c:out value="${cri.amount}"/>'>
+			
+			<!-- 조회페이지에서 검색 처리 -->
+			<input type="hidden" name="type" value='<c:out value="${cri.type}"/>'>
+    		<input type="hidden" name="keyword" value='<c:out value="${cri.keyword}"/>'>
 		</form>
 	
 </div>

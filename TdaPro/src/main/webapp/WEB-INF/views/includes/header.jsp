@@ -64,10 +64,6 @@
 				<img src="/resources/images/logo.png" / width="40" height="32">
 				&nbsp;&nbsp;&nbsp;<span class="fs-4">TS Art Design</span>
 			</a>
-			<form class="col-12 col-lg-auto mb-3 mb-lg-0">
-				<input type="search" class="form-control" placeholder="Search..."
-					aria-label="Search">
-			</form>
 		</div>
 	</header>
 

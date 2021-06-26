@@ -12,7 +12,7 @@ public interface Review_ReplyMapper {
 	
 	public Review_ReplyVO read(Long bno); // 조회 (게시물 번호)
 	 
-	public int delete (int rno); //삭제 (댓글의 번호)
+	public int delete (Long rno); //삭제 (댓글의 번호)
 	
 	public int update(Review_ReplyVO reply); // 수정
 	

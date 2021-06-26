@@ -344,4 +344,75 @@ MyBatis에서 전체 데이터 개수 처리 ( 현재는 임시로 123으로 받
 ---> service에 전체 데이터수를 구하는 서비스생성
 ---> ReviewController 이동후 임시로 사용했던 123대신 service 메서드를 사용후 total을 구한뒤 전체데이터수 pageDTO에 담아 전달 (pageMaker)
      
+	
+■■■■■■■■■■■■■■■2021-06-25■■■■■■■■■■■■■■■
 
+검색조건처리 
+
+MyBatis XML에서 동적태그를 이용해  OGNL 표현식을 이용해 조건문을 생성
+
+페이징처리했던 Criteria 클래스에 검색조건 처리도 같이 해주기위해 코드추가
+
+ReviewMapper.xml에서의 getListWithPaging() 수정을 통해 동적 SQL을 처리 ( <sql>태그 사용 <include> 적용 )
+
+ReviewMapperTests 클래스에서 테스트 ( 실행할때 만들어지는 SQL이 정상작동하는지 )
+
+화면에서 검색조건을 처리하기위한 view 수정 
+
+view에서 검색조건처리가 잘되는지 테스트 ( 영문과 한글 )
+
+검색버튼 스크립트 이벤트처리 (페이지가 1페이지로 보이도록수정 , 입력안했을시 경고창 출력)
+
+검색했을시 검색조건과 키보드가 노출될수있도록 list.jsp 수정
+
+페이지 번호 이동시 검색조건과 키워드도 같이 전달되어야하므로 form 안에 Type , Keyword 추가
+ 
+조회 페이지에도 검색처리 get.jsp의  ( form 안에 Type , Keyword 추가 )
+
+수정/삭제 페이지에도 검색처리 modify.jsp의  ( form 안에 Type , Keyword 추가 )
+---> 수정/삭제 처리는 ReviewController에서 redirect방식으로 동작하기때문에 컨트롤러에서 type, keyword 조건을 같이 포함
+---> 관련된 JavaScript 코드 수정
+
+Criteria 클래스 안에 UriComponentsBuilder 를 사용해 피라미터들을 URL형태로 만들어 컨트롤에서 리다이렉트시 코드길이를 줄여주는 메서드 추가
+---> 새로만든 메서드를 ReviewController에 적용해서 코드양을 줄임
+
+
+
+REST 방식의 Ajax를 사용하여 Review의 댓글처리
+--->테스트하기위해 Restlet Client 도구 사용
+
+▶댓글 처리를 위한 테이블 생성
+create table rv_reply(
+    rno number(10,0),
+    bno number(10,0) not null,
+    reply varchar2(1000) not null,
+    replyer varchar2(50) not null,
+    replyDate date default sysdate,
+    updateDate date default sysdate
+ );
+
+▶댓글 처리시 사용할 시퀀스
+create sequence rv_seq_reply;
+
+▶rv_reply 테이블 권한 설정 (pk)
+alter table rv_reply add constraint pk_reply primary key (rno);
+    
+▶rv_reply 테이블과 review_board 테이블의 (bno)값으로 fk 설정 
+alter table rv_reply add constraint fk_review_reply foreign key (bno) references review_board(bno);
+
+
+domain패키지에 Review_ReplyVO 클래스 생성 테이블값을 변수로 생성
+
+Review_ReplyMapper 인터페이스와 XML 생성 및 처리
+
+Review_ReplyMapper 테스트
+
+
+---------------------------------------------------------------------------------------------------
+Review_ReplyMapper를 이용한 CRUD 작업 및 테스트
+
+댓글 목록작업 및 테스트 (@Param 어노테이션을 이용하는 방식)
+-->SQL사용시 '#{}' 의 이름으로 사용이가능 	
+	
+■■■■■■■■■■■■■■■2021-06-2?■■■■■■■■■■■■■■■
+	

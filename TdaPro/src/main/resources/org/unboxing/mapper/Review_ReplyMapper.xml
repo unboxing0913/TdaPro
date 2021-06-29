@@ -26,12 +26,39 @@
 	update rv_reply set reply = #{reply}, updatedate = sysdate where rno = #{rno}
 </update>
 
+
 <!-- 목록 -->
+<!-- 
 <select id="getListWithPaging" resultType="org.unboxing.domain.Review_ReplyVO">
-	select rno , bno , reply , replyer , replyDate , updatedate
+select rno , bno , reply , replyer , replyDate , updatedate
 	from rv_reply 
-	where bno = #{bno} <!-- 파라미터로 받은 @Param("bno")와 매칭되어 사용됨 -->
+	where bno = #{bno} 파라미터로 받은 @Param("bno")와 매칭되어 사용됨
 	order by rno asc
+</select>	
+ -->
+ 
+ 
+<!-- 목록(페이징처리 포함) -->
+<select id="getListWithPaging" resultType="org.unboxing.domain.Review_ReplyVO">
+	<![CDATA[
+	select rno,bno,reply,replyer,replydate,updatedate
+      from (
+		    select /*+INDEX(rv_reply idx_reply*/
+		    rownum rn,rno,bno,reply,replyer,replyDate,updatedate
+		    from rv_reply
+		    where bno = #{bno}
+		    and rno > 0
+		    and rownum <= #{cri.pageNum} * #{cri.amount}
+		    ) 
+	where rn > (#{cri.pageNum}-1) * #{cri.amount}
+	]]>	
+</select>
+
+<!-- 댓글 전체 숫자 파악 -->
+<select id="getCountByBno" resultType="int">
+<![CDATA[
+select count(rno) from rv_reply where bno = #{bno}
+]]>
 </select>
 
 </mapper>

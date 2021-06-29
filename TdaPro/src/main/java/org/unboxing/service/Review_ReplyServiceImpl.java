@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.unboxing.domain.Criteria;
+import org.unboxing.domain.Review_ReplyPageDTO;
 import org.unboxing.domain.Review_ReplyVO;
 import org.unboxing.mapper.Review_ReplyMapper;
 
@@ -48,6 +49,12 @@ public class Review_ReplyServiceImpl implements Review_ReplyService{
 	public List<Review_ReplyVO> getList(Criteria cri, Long bno) {
 		log.info("댓글 목록 처리 ---> " + bno);
 		return mapper.getListWithPaging(cri, bno);
+	}
+
+	@Override
+	public Review_ReplyPageDTO getListPage(Criteria cri, Long bno) {
+		log.info("댓글 목록 페이징처리");
+		return new Review_ReplyPageDTO(mapper.getCountByBno(bno),mapper.getListWithPaging(cri, bno));
 	}
 
 }

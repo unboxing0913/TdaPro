@@ -16,7 +16,9 @@ public interface Review_ReplyMapper {
 	
 	public int update(Review_ReplyVO reply); // 수정
 	
-	public List<Review_ReplyVO> getListWithPaging(
+	public List<Review_ReplyVO> getListWithPaging( // 댓글 목록 처리
 			@Param("cri") Criteria cri,
 			@Param("bno") Long bno);
+	
+	public int getCountByBno(Long bno); // 해당 게시글 댓글전체숫자 파악
 }

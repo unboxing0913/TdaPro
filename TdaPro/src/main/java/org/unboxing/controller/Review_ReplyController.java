@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.unboxing.domain.Criteria;
+import org.unboxing.domain.Review_ReplyPageDTO;
 import org.unboxing.domain.Review_ReplyVO;
 import org.unboxing.service.Review_ReplyService;
 
@@ -49,7 +50,7 @@ public class Review_ReplyController {
 				: new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);	
 	
 	}
-	
+	/*
 	//특정 게시글 댓글목록 처리
 	@GetMapping(value="/pages/{bno}/{page}",
 			produces = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_UTF8_VALUE})
@@ -63,6 +64,17 @@ public class Review_ReplyController {
 		
 		return new ResponseEntity<>(service.getList(cri, bno),HttpStatus.OK);
 	
+	}
+	*/
+	
+	//특정 게시글 댓글목록 처리 (페이징처리)
+	@GetMapping(value="/pages/{bno}/{page}",
+			produces = {MediaType.APPLICATION_XML_VALUE , MediaType.APPLICATION_JSON_UTF8_VALUE})
+	public ResponseEntity<Review_ReplyPageDTO> getList(@PathVariable("page") int page , @PathVariable("bno") Long bno){
+		Criteria cri = new Criteria(page,10);
+		log.info("get Reply List bno ----> " +bno);
+		log.info("cri : " + cri);
+		return new ResponseEntity<>(service.getListPage(cri, bno),HttpStatus.OK);
 	}
 	
 	

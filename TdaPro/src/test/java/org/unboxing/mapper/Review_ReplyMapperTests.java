@@ -73,4 +73,12 @@ public class Review_ReplyMapperTests {
 		List<Review_ReplyVO> replies = mapper.getListWithPaging(cri , bnoArr[0]);
 		replies.forEach(reply -> log.info(reply));
 	}
+	
+	//목록 테스트 ( 페이징처리 포함 )
+	@Test
+	public void testList2() {
+		Criteria cri = new Criteria(2,10);
+		List<Review_ReplyVO> replies = mapper.getListWithPaging(cri,900L);
+		replies.forEach(reply -> log.info(reply));
+	}
 }

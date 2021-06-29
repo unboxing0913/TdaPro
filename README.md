@@ -414,5 +414,41 @@ Review_ReplyMapper를 이용한 CRUD 작업 및 테스트
 댓글 목록작업 및 테스트 (@Param 어노테이션을 이용하는 방식)
 -->SQL사용시 '#{}' 의 이름으로 사용이가능 	
 	
-■■■■■■■■■■■■■■■2021-06-2?■■■■■■■■■■■■■■■
+■■■■■■■■■■■■■■■2021-06-26■■■■■■■■■■■■■■■
+
+서비스 영역과 Controller 처리
+Review_ReplyService 인터페이스와 구현한 Impl 클래스로 서비스 명령처리
+
+Review_ReplyController 설계
+
+▶등록 
+URL : /review/replies/new
+HTTP 전송방식 : POST
+---> 처리후 Yet Another REST Client를 이용해 테스트
+      정상적으로 데이터베이스 추가된것 확인
+
+▶조회 
+URL : /review/replies/:rno
+HTTP 전송방식 : GET
+---> 처리후 http://localhost:8080/review/replies/pages/900/1 주소에 값을입력해 잘 전달되는것 확인(값은 게시글번호)
+
+▶삭제 
+URL : /review/replies/:rno
+HTTP 전송방식 : DELETE
+---> 처리후 Yet Another REST Client를 이용해 테스트
+      정상적으로 데이터베이스 삭제된것 확인
+
+▶수정 
+URL : /review/replies/:rno
+HTTP 전송방식 : PUT or PATCH
+---> 처리후 Yet Another REST Client를 이용해 테스트
+      정상적으로 데이터베이스 수정된것 확인 (bno안에있는 {rno} 가 맞아야 수정되는것 확인)
+
+
+▶목록 
+URL : /review/replies/pages/:bno/page
+HTTP 전송방식 : GET
+---> 처리후 http://localhost:8080/review/replies/10 주소에 값을입력해 잘 전달되는것 확인 (값은 댓글번호)
+
 	
+■■■■■■■■■■■■■■■2021--■■■■■■■■■■■■■■■

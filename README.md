@@ -451,4 +451,105 @@ HTTP 전송방식 : GET
 ---> 처리후 http://localhost:8080/review/replies/10 주소에 값을입력해 잘 전달되는것 확인 (값은 댓글번호)
 
 	
-■■■■■■■■■■■■■■■2021--■■■■■■■■■■■■■■■
+■■■■■■■■■■■■■■■2021-06-28 ~ 2021-06-29■■■■■■■■■■■■■■■
+어제 깃허브에 커밋을 올리지못하고 종료 오늘 이어서 2일치 
+
+서비스 영역과 Controller 처리
+Review_ReplyService 인터페이스와 구현한 Impl 클래스로 서비스 명령처리
+
+Review_ReplyController 설계
+
+▶등록 
+URL : /review/replies/new
+HTTP 전송방식 : POST
+---> 처리후 Yet Another REST Client를 이용해 테스트
+      정상적으로 데이터베이스 추가된것 확인
+
+▶조회 
+URL : /review/replies/:rno
+HTTP 전송방식 : GET
+---> 처리후 http://localhost:8080/review/replies/pages/900/1 주소에 값을입력해 잘 전달되는것 확인(값은 게시글번호)
+
+▶삭제 
+URL : /review/replies/:rno
+HTTP 전송방식 : DELETE
+---> 처리후 Yet Another REST Client를 이용해 테스트
+      정상적으로 데이터베이스 삭제된것 확인
+
+▶수정 
+URL : /review/replies/:rno
+HTTP 전송방식 : PUT or PATCH
+---> 처리후 Yet Another REST Client를 이용해 테스트
+      정상적으로 데이터베이스 수정된것 확인 (bno안에있는 {rno} 가 맞아야 수정되는것 확인)
+
+
+▶목록 
+URL : /review/replies/pages/:bno/page
+HTTP 전송방식 : GET
+---> 처리후 http://localhost:8080/review/replies/10 주소에 값을입력해 잘 전달되는것 확인 (값은 댓글번호)
+
+-----------------------------------------------------
+#2021-06-28
+
+JavaScript 준비 (Review 의 Reply 에 대한 스크립트) 
+resources / js (폴더를만들고) / review_reply.js 라는 전용으로 처리할 스크립트 파일을 만들어줌
+--->get.jsp에 테스트 스크립트를 추가해주고 잘적용되는지 테스트
+
+review_reply.js 내에는 등록 , 목록 , 삭제 , 수정 , 조회 처리를 스크립트에서 (객체,콜백)형태로 전달 호출
+
+▶등록 : Ajax를 이용해 POST방식으로 호출하는 코드로 작성 
+
+▶목록 : jQuery의 getJSON() 을 이용해 댓글의 전체 댓글 목록을 가져오는 처리 
+------>param이라는 객체를 통해 필요한 파라미터를 전달받아 JSON 목록을 호출
+
+▶삭제 : DELETE방식을 통해 해당 URL을 호출하는방식 (ajax를 이용해 타입을 구체적으로 delete 로 지정
+
+▶수정 : 수정하는 내용과 함께 댓글의 번호전송 , JSON형태로 전송하기때문에 등록과 유사함
+
+get.jsp에서 <script> 태그를 이용해 테스트후 주석처리 
+
+-----------------
+이벤트 처리와 HTML처리
+---> 화면에서 버튼으로 발생하는 이벤트를 감지하고 Ajax호출의 결과를 화면에 반영
+
+결과를 반영하기위해 get.jsp에 댓글목록을 보여줄수있는 화면을 추가
+
+
+게시글 조회페이지가 열리면 자동으로 댓글목록을 가져와서 <li>태그를 구성하게하기위한 스크립트처리
+--->댓글조회후 JSON 형태인 데이터를 오늘작성한 데이터는 시/분 아닌 데이터는 년/월/일 로 바꿔줄수있도록 review_reply.js 에서 수정
+
+get.jsp 의 댓글 공간 상단에는 사용자를 위한 새로운댓글 달수있는 버튼을 추가
+
+댓글추가는 모달창(bootstrap)을 이용해 처리하도록 get.jsp코드를 추가
+
+댓글등록 버튼 클릭시 modal관련된 자바스크립트를 통해 모달창이 보여지게 처리
+
+버튼등록클릭시 이벤트처리 이후 갱신처리
+
+특정댓글의 클릭이벤트처리
+
+댓글 수정이벤트처리 (모달창에있는 data-rno 값으로)
+
+댓글 삭제이벤트처리 (모달창에있는 data-rno 값으로)
+
+댓글의 페이징처리 (인덱스를 생성해 구조를만듬)
+---> Review_ReplyMapper.xml 에서 페이징처리를 통한 목록처리후 테스트
+---> 테스트를 하기위한 게시글번호에 댓글을 20개이상 작성
+
+해당 게시물 댓글의 전체 숫자를 파악해 화면에 보이게만들어 주기위한 Review_ReplyMapper 인터페이스 추가 xml 입력
+---> 댓글 목록과 함께 전체 댓글의 수를 같이 전달하기위한 Review_ReplyPageDTO 클래스 작성해준다
+---> Review_ReplyService 인터페이스와 구현클래스 Impl 구조를 Review_ReplyPageDTO를 전달 받도록 변경
+---> Review_ReplyController에서 새롭게 추가된 getListPage() 호출후 데이터를 전송하는 형태로 수정
+
+
+댓글의 화면처리 
+--> 가장 오래된 댓글이 1페이지 보여지도록 
+--> 1페이지 게시물 가져올때 해당게시물의 숫자를 파악 댓글페이지 번호를 출력
+--> 댓글이 추가되면 댓글 숫자만을 가져와서 최종페이지를 찾아 이동
+--> 댓글의 수정과 삭제후 다시 동일페이지 호출
+
+review_reply.js 의 getList 함수 부분 수정 (DTO를 가져오게끔)
+
+댓글의 화면처리할부분을 만들고 JavaScript를 사용하여 기존의 Java로만들었던 PageMaker를 만들어준다.
+
+: 현재 날짜별로 시간이 저장이안되는문제 발생 추후에 해결할예정

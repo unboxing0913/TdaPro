@@ -2,6 +2,7 @@ package org.unboxing.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.unboxing.domain.Criteria;
 import org.unboxing.domain.ReviewVO;
 
@@ -31,5 +32,7 @@ public interface ReviewMapper {
 	//데이터 수정도 마찬가지로 몇개의 데이터를 수정했는지 처리하기위해 int 타입(최종수정시간 : 현재시간)
 	public int update(ReviewVO board);
 	
+	//현재 게시글의 총 댓글수를 구하기위함
+	public void updateReplyCnt(@Param("bno") Long bno, @Param("amount") int amount);
 	
 }

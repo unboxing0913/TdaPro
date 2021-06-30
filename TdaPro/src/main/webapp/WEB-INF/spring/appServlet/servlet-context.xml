@@ -24,5 +24,8 @@
 	<context:component-scan base-package="org.unboxing.controller" />
 	<context:component-scan base-package="org.unboxing.exception" />
 	
+	<!-- 첨부파일을 처리 하는 빈 -->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"></beans:bean>
+	
 	
 </beans:beans>

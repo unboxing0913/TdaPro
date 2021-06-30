@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.unboxing.domain.Criteria;
 import org.unboxing.domain.Review_ReplyPageDTO;
 import org.unboxing.domain.Review_ReplyVO;
+import org.unboxing.mapper.ReviewMapper;
 import org.unboxing.mapper.Review_ReplyMapper;
 
-import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
@@ -21,9 +22,18 @@ public class Review_ReplyServiceImpl implements Review_ReplyService{
 
 	@Setter(onMethod_=@Autowired)
 	private Review_ReplyMapper mapper;
+	
+	@Setter(onMethod_=@Autowired)
+	private ReviewMapper rv_mapper; //트랜잭션처리를 위함
+	
+	@Transactional
 	@Override
 	public int register(Review_ReplyVO vo) {
 		log.info("등록처리 ---> " + vo);
+		
+		//전달받은 vo 객체 내의 게시물번호로 댓글추가
+		rv_mapper.updateReplyCnt(vo.getBno(), 1);
+		
 		return mapper.insert(vo);
 	}
 
@@ -39,9 +49,15 @@ public class Review_ReplyServiceImpl implements Review_ReplyService{
 		return mapper.update(vo);
 	}
 
+	@Transactional //트랜잭션 처리
 	@Override
 	public int remove(Long rno) {
 		log.info("삭제처리 ---> " + rno);
+	
+		//피라미터로 전달받은 게시물 번호로 게시물정보를 알아낸뒤 현재게시글 총 댓글수 구함
+		Review_ReplyVO vo = mapper.read(rno);
+		rv_mapper.updateReplyCnt(vo.getBno(), -1);
+		
 		return mapper.delete(rno);
 	}
 
@@ -56,5 +72,6 @@ public class Review_ReplyServiceImpl implements Review_ReplyService{
 		log.info("댓글 목록 페이징처리");
 		return new Review_ReplyPageDTO(mapper.getCountByBno(bno),mapper.getListWithPaging(cri, bno));
 	}
+	
 
 }

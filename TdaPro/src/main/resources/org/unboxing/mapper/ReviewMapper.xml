@@ -41,11 +41,11 @@ select * from review_board where bno > 0
 <select id="getListWithPaging" resultType="org.unboxing.domain.ReviewVO">
 <![CDATA[
 select 
-	bno , title , content , writer , regdate , updatedate
+	bno , title , content , writer , regdate , updatedate , replyCnt
 	from(
 		select
 			/*+INDEX_DESC(review_board pk_review_board)*/
- 			rownum rn , bno , title , content , writer , regdate , updatedate
+ 			rownum rn , bno , title , content , writer , regdate , updatedate , replyCnt
 			from review_board where 
 ]]>
 
@@ -104,4 +104,11 @@ select
 <delete id="delete">
 	delete from review_board where bno = #{bno}
 </delete>
+
+
+
+<!-- 현재 게시글의 총 댓글수를 구함 -->
+<update id="updateReplyCnt">
+	update review_board set replycnt = replycnt + #{amount} where bno = #{bno}
+</update>
 </mapper>

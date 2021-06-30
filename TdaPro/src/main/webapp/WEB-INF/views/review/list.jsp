@@ -38,7 +38,11 @@
 			<th scope="row"><c:out value="${board.bno}"/></th>
 			<%-- <td><a href='/review/get?bno=<c:out value="${board.bno}"/>'><c:out value="${board.title}"/></td> 
 			get.jsp -> 목록버튼 클릭시 파라미터 pageNum과 amount를 같이 전달하기위해 밑의 방법으로 <a>태그를 javaScript로 해결 --%>
-			<td><a class='move' href='<c:out value="${board.bno}"/>'><c:out value="${board.title}"/></a>
+			<td>
+			<a class='move' href='<c:out value="${board.bno}"/>'><c:out value="${board.title}"/>
+			<!-- 게시글 댓글수 -->
+			<b>[<c:out value="${board.replyCnt}"/>]</b>
+			</a>
 			<td><c:out value="${board.writer}"/></td>
 			<td><fmt:formatDate value="${board.regdate}" pattern="yyyy-MM-dd"/></td>
 			<td><fmt:formatDate value="${board.updateDate}" pattern="yyyy-MM-dd"/></td>		

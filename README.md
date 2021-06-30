@@ -553,3 +553,77 @@ review_reply.js 의 getList 함수 부분 수정 (DTO를 가져오게끔)
 댓글의 화면처리할부분을 만들고 JavaScript를 사용하여 기존의 Java로만들었던 PageMaker를 만들어준다.
 
 : 현재 날짜별로 시간이 저장이안되는문제 발생 추후에 해결할예정
+	
+	
+
+■■■■■■■■■■■■■■■2021-06-30■■■■■■■■■■■■■■■
+
+: 현재 날짜별로 시간이 저장이안되는문제 발생 추후에 해결할예정
+----> Review_ReplyMapper.xml 안에 인덱스를 넣어 SQL문을 처리했는데 idx를 안만들어주고 처리함
+----> create index idx_reply on rv_reply (bno desc,rno asc);  데이터베이스에 인덱스를 만들어주어 처리완료 정상작동 
+
+----------------
+
+댓글과 댓글 수에대한 처리 
+
+게시글의 댓글수에 대한 처리를 트랜잭션으로 하기위해 트랜잭션 설정을 추가해준다.
+---> root-context.xml안의 <tx:annotation-driven> 태그를 등록
+
+ReviewVO 와 ReviewMapper 안에 댓글의 숫자를 의미하는 인스턴스 변수를 추가
+---->데이터베이스에도 replyCnt라는 칼럼을 추가해준다
+alter table review_board add (replyCnt number default 0);
+
+기존에 존재하고있는 댓글을 반영하기 위한 쿼리또한 실행시켜준다.
+update review_board set replyCnt = ( 
+	select count(rno) from rv_reply where rv_reply.bno = review_board.bno
+	);
+
+ReviewMapper.xml 안에 replycnt 칼럼이 업데이트 될수있도록 인터페이스메소드를 xml로 구현 해준다.
+---> ReviewMapper.xml 안의 게시물 목록을 처리하는 부분또한 replyCnt 칼럼을 가져오도록 수정해준다.
+
+Review_ReplyServiceImpl 의 트랜잭션처리
+---> 게시물에 새로운 댓글이 추가되거나 삭제되는 상황에서 ReviewMapper와 Review_ReplyMapper를 같이이용해 처리 (트랜잭션)
+
+화면처리
+--->화면에서 댓글의 숫자(replyCnt)가 출력될수있도록 수정
+--->화면처리가 잘되지않고 등록 수정에 문제가 생겨 무슨일인가 했지만 데이터베이스 commit을 안해서 생긴 실수
+
+
+----------------
+
+파일 업로드 처리 (Ajax를 이용하는 방식)
+실제 서버가 동작하는 머신내에 있는 폴더에 업로드 시키기위해 
+
+c드라이브 -> upload 폴더 -> review 파일을 저장할 review 폴더 생성  (web.xml의 임시저장소는 c->upload->temp)
+
+web.ml 상단의 네임스페이스 2.5버전을 찾아서 수정
+
+ReviewController안에 파일업로드를 위한 매핑 추가
+
+파일 업로드를 할수있는 uploadAjax.jsp 추가 (실제 홈페이지와 연결전 첨부파일처리 테스트를 하기위함 +매핑연결 테스트)
+
+업로드한 파일을 받아 저장처리를 할수있는 매핑추가
+
+파일 업로드 상세처리 
+---> 확장자 , 크기 사전처리  script함수로 구현해서 처리
+---> 한 폴더내의 너무많은 파일의 생성문제를 막기위한 년/월/일 폴더로 첨부파일 보관 (ReviewController에서 메소드추가 적용)
+---> 중복되는 이름 UUID를 이용해 랜덤문자열 생성 처리
+
+업로드한 파일 섬네일 이미지생성
+---> Thumbnailator 라이브러리를 사용 (pom.xml에 추가)
+---> 섬네일화 할 파일이 이미지파일인지 타입을 검사하는 메서드추가
+---> 파일 업로드 매핑시 섬네일화 할수있는 메서드 추가 수정
+
+별도의 객체를 생성해 업로드 객체를 반환
+--->  jacson-databind 관련 라이브러리들이 존재하는지 확인
+---> 첨부파일 정보를 저장하는 클래스 작성 (Review_AttachFileDTO)
+---> ReviewController의 첨부파일 매핑부분에서 첨부파일정보를 저장한 클래스를 반환하는 구조로변경 
+---> uploadAjax.jsp 에서 결과데이터를 json으로 반환된 정보를 처리할수있도록 수정 (dataType : 'json') 
+
+브라우저에서 섬네일처리
+---> 게시판페이지 연결전 테스트하기위한 uploadAjax.jsp를 사용
+---> 네일처리 , 이름출력 , 일반파일처리(이미지X) , 업로드후 다운로드 , 한글값 인코딩 처리 , 이벤트처리 , 삭제처리 테스트
+
+
+* 현재 첨부파일 테스트 페이지 링크 클릭시 다운로드가 안되는 현상발생 (시간을 너무 뺏겨 내일 수정계획) 
+* 깃허브 push시 cannot open git-receive-pack 오류 발생 ( 내일 해결 예정 ) --> push또한 내일 한번에 2일치 올릴예정

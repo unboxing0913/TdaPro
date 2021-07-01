@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,8 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.unboxing.domain.Criteria;
 import org.unboxing.domain.PageDTO;
+import org.unboxing.domain.ReviewAttachVO;
 import org.unboxing.domain.ReviewVO;
-import org.unboxing.domain.Review_AttachFileDTO;
 import org.unboxing.service.ReviewService;
 
 import lombok.AllArgsConstructor;
@@ -78,6 +81,14 @@ public class ReviewController {
 	public String register(ReviewVO board, RedirectAttributes rttr) {
 		//RedirectAttributes의 addFlashAttribute경우 일회성데이터를 전달하기때문에 중복처리하기 좋음
 		log.info("register : "+board);
+		
+		//input의 hidden타입의 정보를 잘받아왔는지 확인
+		log.info("test-----------------------------------------------");
+		if(board.getAttachList() != null) {
+			board.getAttachList().forEach(attach -> log.info(attach));
+		}
+		log.info("test-----------------------------------------------");
+		
 		service.register(board);
 		rttr.addFlashAttribute("result",board.getBno()); 
 		
@@ -153,6 +164,7 @@ public class ReviewController {
 	}
 	*/
 	
+	/* uploadAjax.jsp 로 테스트시 사용
 	@PostMapping("/remove")
 	public String remove(@RequestParam("bno") Long bno,RedirectAttributes rttr,Criteria cri) {
 		log.info("remove Bno : " +bno);
@@ -164,6 +176,56 @@ public class ReviewController {
 		// Criteria 클래스의 getListLink()메서드를 가지고 UriComponentsBuilder 기능으로 url 처리
 		return "redirect:/review/list"+cri.getListLink();
 	}
+	*/
+	
+	//게시글 삭제
+	//삭제전 첨부파일 목록확보 후 게시물 과 첨부파일데이터 삭제 -> 삭제성공후 실제파일의 삭제
+	@PostMapping("/remove")
+	public String remove(@RequestParam("bno") Long bno,@ModelAttribute("cri")Criteria cri , RedirectAttributes rttr, String writer) {
+		log.info("remove..."+bno);
+		
+		List<ReviewAttachVO> attachList = service.getAttachList(bno); //첨부파일 목록 확보
+		
+		if(service.remove(bno)) {
+			
+			//delete Attach Files
+			deleteFiles(attachList);
+			
+			rttr.addFlashAttribute("result","success");
+		}
+		/*
+		 * rttr.addAttribute("pageNum",cri.getPageNum());
+		 * rttr.addAttribute("amount",cri.getAmount());
+		 * rttr.addAttribute("type",cri.getType());
+		 * rttr.addAttribute("keyword",cri.getKeyword());
+		 */
+		return "redirect:/review/list"+cri.getListLink();
+	}
+	
+	//게시글 삭제시 첨부파일데이터 삭제
+	private void deleteFiles(List<ReviewAttachVO> attachList) {
+		if(attachList == null || attachList.size() == 0 ) {
+			return;
+		}
+		log.info("delete attach files");
+		log.info(attachList);
+		
+		attachList.forEach(attach -> {
+			
+			
+			try {
+				Path file = Paths.get("C:\\upload\\review\\"+attach.getUploadPath()+"\\"+attach.getUuid()+"_"+attach.getFileName());
+				Files.deleteIfExists(file);
+				if(Files.probeContentType(file).startsWith("image")) {
+					Path thumbNail = Paths.get("C:\\upload\\review\\"+attach.getUploadPath()+"\\s_"+attach.getUuid()+"_"+attach.getFileName());
+					Files.delete(thumbNail);
+				}
+			}catch (IOException e) {
+				log.error("delete file error"+e.getMessage());
+			}
+		});
+	}
+	
 	
 	/*Review게시판 파일 업로드 관련 매핑클래스 와 설정클래스 */
 	
@@ -248,9 +310,9 @@ public class ReviewController {
 	//파일 업로드시 매핑 + 업로드된 파일 반환하기위한 구조변경
 	@PostMapping(value="/uploadAjaxAction", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody
-	public ResponseEntity<List<Review_AttachFileDTO>> uploadAjaxPost(MultipartFile[] uploadFile) {
+	public ResponseEntity<List<ReviewAttachVO>> uploadAjaxPost(MultipartFile[] uploadFile) {
 		
-		List<Review_AttachFileDTO> list = new ArrayList<>(); // 추가된 구조 (추가하기위한 리스트생성)
+		List<ReviewAttachVO> list = new ArrayList<>(); // 추가된 구조 (추가하기위한 리스트생성)
 		String uploadFolder = "C:\\upload\\review";
 		
 		String uploadFolderPath = getFolder(); // 추가된 구조 (dto안에 uploadpath에 담을 값을 만듬)
@@ -266,7 +328,7 @@ public class ReviewController {
 			log.info("업로드 파일명 ----> " +multipartFile);
 			log.info("업로드 파일 사이즈 --> "+multipartFile.getSize());
 			
-			Review_AttachFileDTO attachDTO = new Review_AttachFileDTO();// 추가된 구조 (전달해줄 dto생성)
+			ReviewAttachVO attachDTO = new ReviewAttachVO();// 추가된 구조 (전달해줄 dto생성)
 			
 			String uploadFileName = multipartFile.getOriginalFilename();
 			
@@ -288,13 +350,22 @@ public class ReviewController {
 				
 				//섬네일 만들기전 파일타입 검사
 				if(checkImageType(saveFile)) {
-					attachDTO.setImage(true); //dto안에 이미지 존재여부 true
+					attachDTO.setFileType(true); //dto안에 이미지 존재여부 true  //test시에는 setImage 현재는 setFileType
 					FileOutputStream thumbnail = new FileOutputStream(new File(uploadPath,"s_"+uploadFileName)); //섬네일은 파일앞에 s_ 로시작
 					Thumbnailator.createThumbnail(multipartFile.getInputStream(),thumbnail,100,100); //섬네일크기 
 				    thumbnail.close();
 				}
 				
-					list.add(attachDTO); // dto값을 list에 담아줌
+				/*
+				log.info("확인 bno"+attachDTO.getBno());
+				log.info("확인 uuid"+attachDTO.getUuid());
+				log.info("확인 uploadPath"+attachDTO.getUploadPath());
+				log.info("확인 filename"+attachDTO.getFileName());
+				log.info("확인"+attachDTO.isFileType());
+				*/	
+				
+				
+				list.add(attachDTO); // dto값을 list에 담아줌 
 				
 			} catch (IllegalStateException e) {
 				log.error(e.getMessage());
@@ -333,7 +404,9 @@ public class ReviewController {
 	@ResponseBody
 	public ResponseEntity<Resource> downloadFile(String fileName, @RequestHeader("User-Agent") String userAgent){
 		log.info("다운로드 파일 ---> " +fileName);
-		Resource resource = new FileSystemResource("c:\\upload\\review"+fileName);
+		
+		
+		Resource resource = new FileSystemResource("c:\\upload\\review\\"+fileName);
 				
 		log.info("resource : " + resource);
 		
@@ -341,7 +414,12 @@ public class ReviewController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		
-		String resourceName = resource.getFilename();
+		String resourceName = resource.getFilename(); 
+		
+		//UUID 지운 본래의 파일명 (브라우저 문제해결하면서 downlaodName을 적용할때 사용)
+		String resourceOriginalName = resourceName.substring(resourceName.indexOf("_")+1);
+		log.info("resourceName -->" +resourceName);
+		log.info("resourceOriginalName -->" +resourceOriginalName);
 		HttpHeaders headers = new HttpHeaders();
 		
 		try {			
@@ -350,14 +428,14 @@ public class ReviewController {
 			// IE,Edge 브라우저 문제해결
 			if(userAgent.contains("Trident")) {
 				log.info("IE browser");
-				downloadName = URLEncoder.encode(resourceName,"UTF-8").replaceAll("\\", "");
+				downloadName = URLEncoder.encode(resourceOriginalName,"UTF-8").replaceAll("\\", "");
 			}else if(userAgent.contains("Edge")) {
 				log.info("Edge browser");
-				downloadName = URLEncoder.encode(resourceName,"UTF-8");
+				downloadName = URLEncoder.encode(resourceOriginalName,"UTF-8");
 				log.info("Edge name : "+downloadName);
 			}else {
 				log.info("Chrome browser");
-				downloadName = new String(resourceName.getBytes("UTF-8"),"ISO-8859-1");
+				downloadName = new String(resourceOriginalName.getBytes("UTF-8"),"ISO-8859-1");
 			}
 			
 			headers.add("Content-Disposition", "attachment; filename="+downloadName);
@@ -366,6 +444,39 @@ public class ReviewController {
 			e.printStackTrace();
 		}
 		return new ResponseEntity<Resource>(resource,headers,HttpStatus.OK);
+	}
+	
+	//(등록시)첨부파일 삭제
+	@PostMapping("/deleteFile")
+	@ResponseBody
+	public ResponseEntity<String> deletFiles(String fileName, String type) {
+		log.info("삭제 파일 ---> " + fileName);
+		
+		File file;
+
+		try {
+			file = new File("c:\\upload\\review\\" + URLDecoder.decode(fileName, "UTF-8"));
+			file.delete();
+			if (type.equals("image")) {
+				String largeFileName = file.getAbsolutePath().replace("s_", "");
+				log.info("largeFileName:" + largeFileName);
+				file = new File(largeFileName);
+				file.delete();
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<String>("deleted", HttpStatus.OK);
+	}
+	
+	
+	// 특정 게시글번호로 첨부파일 관련된 데이터를 JSON형태로 반환
+	@GetMapping(value="/getAttachList",produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseBody
+	public ResponseEntity<List<ReviewAttachVO>> getAttachList(Long bno){
+		log.info("게시글 번호 ---> "+bno);
+		return new ResponseEntity<>(service.getAttachList(bno),HttpStatus.OK);
 	}
 	
 

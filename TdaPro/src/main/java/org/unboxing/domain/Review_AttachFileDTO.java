@@ -9,4 +9,5 @@ public class Review_AttachFileDTO {
 	private String uploadPath; //업로드경로
 	private String uuid; //uuid값
 	private boolean image; //이미지 여부
+	
 }

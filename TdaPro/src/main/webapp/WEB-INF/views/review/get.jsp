@@ -2,6 +2,9 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<!-- upload css -->
+<link href="/resources/css/upload_css.css" rel="stylesheet" type="text/css">
+
 <!-- header -->
 <%@include file="../includes/header.jsp" %>
 
@@ -65,16 +68,43 @@
 	</form>
 
 	<br>
+
+
+<!-- 첨부파일 화면처리 -->
+<div class="card mb-2">
+	
+	<div class="card-header bg-light">
+	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-files" viewBox="0 0 16 16">
+  		<path d="M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a2 2 0 0 0-2-2H5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z"/>
+	</svg>
+	Files
+	</div>		
+	
+	<div class="card-body">	
+		<!-- 첨부파일 보여지는 영역  -->	
+		<div class="uploadResult">
+			<ul>
+			</ul>
+		</div>
+		
+		<!-- 첨부파일(이미지)클릭시 원본이미지 보여지는공간  -->
+		<div class='bigPictureWrapper'>
+			<div class='bigPicture'>
+			</div>
+		</div>
+	</div>
+	
+</div>
 	
 	
 <!-- 댓글 목록 화면처리 -->
-<div class="card mb-2">
+<div class="card lg-12">
 	<div class="card-header bg-light">
-			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-text-fill" viewBox="0 0 16 16">
+		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-text-fill" viewBox="0 0 16 16">
   			<path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM4.5 5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7zm0 2.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7zm0 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4z"/>
-			</svg>
-			댓글
-			<button id="addReplyBtn" class="btn btn-primary" style='float:right'>댓글 등록</button>
+		</svg>
+		댓글
+		<button id="addReplyBtn" class="btn btn-primary" style='float:right'>댓글 등록</button>
 		</div>
 		<div class="card-body">
 			<ul class="chat">
@@ -89,7 +119,8 @@
 				</li>
 			</ul>
 		</div>
-	</div>
+</div>
+
 </div>
 
 
@@ -195,6 +226,67 @@ review_replyService.get(11,function(data){
 <!-- script -->
 <script type="text/javascript">
 $(document).ready(function(){
+	
+	//해당 게시물의 첨부파일을 가져오는부분 (가장먼저 동작해야함)
+	(function(){
+		var bno = '<c:out value="${board.bno}"/>';
+		$.getJSON("/review/getAttachList",{bno:bno},function(arr){
+			console.log(arr);
+			var str = "";
+			
+		//조회게시판에 첨부파일을 보여주기위한 스크립트
+			$(arr).each(function(i,attach){
+				
+			//image type
+			if(attach.fileType){
+				var fileCallPath = encodeURIComponent(attach.uploadPath+"/s_"+attach.uuid+"_"+attach.fileName);
+				str += "<li data-path='"+attach.uploadPath+"' data-uuid='"+attach.uuid+"' data-filename='"+attach.fileName+"' data-type='"+attach.fileType+"'><div>";
+				str += "<img src='/review/display?fileName="+fileCallPath+"' class='img-responsive img-thumbnail'>";
+				str += "</div>";
+				str += "</li>"
+			}else{
+				str += "<li data-path='"+attach.uploadPath+"' data-uuid='"+attach.uuid+"' data-filename='"+attach.fileName+"' data-type='"+attach.fileType+"'><div>";
+				str += "<span>"+attach.fileName+"</span></br>";
+				str += "<img src='/resources/images/attach.png' class='img-responsive img-thumbnail'>";
+				str += "</div>";
+				str += "</li>";
+				}
+			});
+		
+			$(".uploadResult ul").html(str);
+		});
+	})();
+	
+	//첨부파일 클릭시 이미지의 경우 원본이미지 보이기 , 일반파일의 경우 다운로드
+	$(".uploadResult").on("click","li",function(e){
+		 console.log("view image");
+	 	 var liObj = $(this);
+	 	 var path = encodeURIComponent(liObj.data("path")+"/"+liObj.data("uuid")+"_"+liObj.data("filename"));
+	 	 
+	 	 if(liObj.data("type")){
+	 		 showImage(path.replace(new RegExp(/\\/g),"/")); //원본이미지 보여주기
+	 	 }else{
+	 		 //download
+	 		 self.location="/review/download?fileName="+path
+	 	 }
+	 });
+	
+	 //원본이미지 보여주기위한 함수
+	 function showImage(fileCallPath){
+		 //alert(fileCallPath);
+		 $(".bigPictureWrapper").css("display","flex").show();
+		 $(".bigPicture").html("<img src='/review/display?fileName="+fileCallPath+"'>").animate({width:'100%',height:'100%'},1000);
+		 
+	 }
+	 
+	 
+	 //원본 이미지 창 닫기
+	 $(".bigPictureWrapper").on("click",function(e){
+		$(".bigPicture").animate({width:'0%',height:'0%'},1000);
+		setTimeout(function(){
+			$('.bigPictureWrapper').hide();
+		},1000);
+	 }); 
 	
 	
 	var bnoValue='<c:out value="${board.bno}"/>';

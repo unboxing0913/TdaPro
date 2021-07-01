@@ -6,52 +6,8 @@
 <head>
 <meta charset="UTF-8">
 <title>파일 업로드</title>
+<link href="/resources/css/upload_css.css" rel="stylesheet" type="text/css">
 </head>
-<style>
-.uploadResult {
-	width:100%;
-	background-color:gray;
-}
-.uploadResult ul{
-	display:flex;
-	flex-flow:row;
-	justify-content:center;
-	align-items:center;
-}
-.uploadResult ul li{
-	list-style:none;
-	padding:10px;
-	align-content : center;
-	text-align : center;
-}
-.uploadResult ul li img{
-	width: 100px;
-}
-.uploadResult ul li span{
-	color : white;
-}
-.bigPictureWrapper{
-	position : absolute;
-	display: none;
-	justify-content: center;
-	align-items: center;
-	top : 0%;
-	width:100%;
-	height: 100%;
-	background-color: gray;
-	z-index:100;
-	background: rgba(255,255,255,0.5);
-}
-.bigPicture{
-	postion:relative;
-	display:flex;
-	justify-content:center;
-	align-items:center;
-}
-.bigPicture img{
-	width:600px;
-}
-</style>
 <body>
 <h1>Upload With Ajax</h1>
 
@@ -64,6 +20,11 @@
 	</ul>
 </div>
 
+<div class='bigPictureWrapper'>
+	<div class='bigPicture'>
+	</div>
+</div>
+
 <button id='uploadBtn'>Upload</button>
 
 
@@ -73,6 +34,44 @@
 <!-- Ajax 첨부파일을 보다 쉽게하기위한 jQuery추가 -->
 <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
 <script>
+
+
+	//원본 이미지를 보여준다.
+	function showImage(fileCallPath){
+		//alert(fileCallPath);
+		$(".bigPictureWrapper").css("display","flex").show();
+		$(".bigPicture").html("<img src='/review/display?fileName="+encodeURI(fileCallPath)+"'>").animate({width:'100%',height:'100%'},1000);
+	}
+	
+	//원본 이미지클릭스 사라지는 이벤트처리
+	$(".bigPictureWrapper").on("click",function(e){
+		$(".bigPicture").animate({width:'0%',height:'0%'},1000);
+		setTimeout(()=>{
+			$(this).hide();	
+		},1000);
+		//setTimeout(function(){        //IE 11버전
+		//$('.bigPictureWrapper').hide();  
+		//}.1000)
+	})
+	
+	//첨부파일 삭제 함수 span 클릭시
+	$(".uploadResult").on("click","span",function(e){
+		var targetFile = $(this).data("file");
+		var type = $(this).data("type");
+		console.log("targetFile"+targetFile);
+		
+		$.ajax({
+			url : '/review/deleteFile',
+			data : {fileName: targetFile, type: type},
+			dataType : 'text',
+			type : 'POST',
+			success : function(result){
+				alert(result);
+			}
+		});		
+	});
+
+	// html 전체 읽고난뒤 실행
 	$(document).ready(function(){
 		
 		// 파일 확장자 , 크기  처리 ( 업로드 상세 처리 )
@@ -106,13 +105,18 @@
 				//이미지 파일이 아닐경우에는 attach.png 로 보이게 수정
 				if(!obj.image){
 					var fileCallPath = encodeURIComponent(obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName);//링크파일다운시 사용
-					str += "<li><a href='/review/download?fileName="+fileCallPath+"'>"+"<img src='/resources/images/attach.png'>"+obj.fileName+"</a></li>";
+					str += "<li><a href='/review/download?fileName="+fileCallPath+"'>"+"<img src='/resources/images/attach.png'>"+obj.fileName+"</a>"
+							+"<span data-file=\'"+fileCallPath+"\' data-type='file'> x </span>"+"</div></li>";
 				}else{
-				//str += "<li>"+obj.fileName+"</li>";	
-					var fileCallPath = encodeURIComponent(obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName);//링크파일다운시 사용
-				// 한글처리와 데이터 섬네일 이미지 보여주기
-				var fileCallPath = encodeURIComponent(obj.uploadPath+"/s_"+obj.uuid+"_"+obj.fileName);
-				str += "<li><a href='/review/download?fileName="+fileCallPath+"'>"+"<img src='/review/display?fileName="+fileCallPath+"'></a></li>";
+					//str += "<li>"+obj.fileName+"</li>";	
+					// 한글처리와 데이터 섬네일 이미지 보여주기	
+					var fileCallPath = encodeURIComponent(obj.uploadPath+"/s_"+obj.uuid+"_"+obj.fileName);//링크파일다운시 사용 ("s_"  섬네일이 붙었기때문에 다운로드는 uuid포함되어있음)						
+					var originPath = obj.uploadPath + "\\" + obj.uuid + "_"+obj.fileName; // 이미지 파일 (섬네일X)
+					originPath = originPath.replace(new RegExp(/\\/g),"/");
+					//섬네일 파일 클릭시 showImage() 함수 호출 (download대신 섬네일클릭시 화면에 보이게)
+					str += "<li><a href=\"javascript:showImage(\'"+originPath+"\')\"><img src='/review/display?fileName="+fileCallPath+"'></a>"
+							+"<span data-file=\'"+fileCallPath+"\' data-type='image'> x </span>"+"</div></li>";
+					//str += "<li><a href='/review/download?fileName="+fileCallPath+"'>"+"<img src='/review/display?fileName="+fileCallPath+"'></a></li>";
 				}
 			});
 			
@@ -156,9 +160,7 @@
 			});
 		});	
 		
-		
-		
-		
+				
 	});
 </script>
 

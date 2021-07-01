@@ -3,6 +3,7 @@ package org.unboxing.service;
 import java.util.List;
 
 import org.unboxing.domain.Criteria;
+import org.unboxing.domain.ReviewAttachVO;
 import org.unboxing.domain.ReviewVO;
 
 public interface ReviewService {
@@ -20,5 +21,7 @@ public interface ReviewService {
 	public boolean remove(Long bno); //delete
 	
 	public int getTotal(Criteria cri); // 전체데이터 개수 처리
+	
+	public List<ReviewAttachVO> getAttachList(Long bno);  //첨부파일 게시글번호를 가져옴
 	
 }

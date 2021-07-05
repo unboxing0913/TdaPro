@@ -479,5 +479,14 @@ public class ReviewController {
 		return new ResponseEntity<>(service.getAttachList(bno),HttpStatus.OK);
 	}
 	
+	@GetMapping("/test")
+	public void test() {
+		
+	}
+	
+	@GetMapping("/test2")
+	public void test2() {
+		
+	}
 
 }

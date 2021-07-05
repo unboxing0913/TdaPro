@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">		
+		<!-- scurity 버전 지워줌 (네임스페이스 5.0 시 문제발생) -->
+		
+		
+		<!-- 접근제한 핸들러 빈 -->
+		<bean id="customAccessDenied" class="org.unboxing.security.CustomAccessDeniedHandler"></bean>
+		
+		<!-- 로그인성공후 담당 핸들러 빈 -->
+		<bean id="customLoginSuccess" class="org.unboxing.security.CustomLoginSuccessHandler"></bean>
+		
+		<!-- BCrytPasswordEncoder  설정 (패스워드 보호) -->
+		<bean id ="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+		
+		<!-- UserDetailsServie 빈생성 -->
+	    <bean id="customUserDetailsService" class="org.unboxing.security.CustomUserDetailsService"></bean>
+		
+		<!-- 시큐리티 설정 -->	
+		<security:http>
+		   	
+		   	<!-- 테스트용 -->
+		    <security:intercept-url pattern="/sample/all" access="permitAll"/>
+			<security:intercept-url pattern="/sample/member" access="hasRole('ROLE_MEMBER')"/>
+			<security:intercept-url pattern="/sample/admin" access="hasRole('ROLE_ADMIN')"/>
+			
+			<!--접근제한 메시지 처리  -->		    
+			 <security:access-denied-handler ref="customAccessDenied"/> <!-- 접근제한 핸들러구현 -->
+				
+			<!--로그인 페이지 설정 + 로그인성공후 처리를 담당하는 핸들러-->
+			<security:form-login login-page="/customLogin" authentication-success-handler-ref="customLoginSuccess"/>
+			
+			<!-- 로그아웃성공후 처리를 담당하는 핸들러 -->
+			<security:logout logout-url="/customLogout" invalidate-session="true"/>
+			
+			<!-- 자동로그인을 위한 설계 -->
+			<security:remember-me data-source-ref="dataSource" token-validity-seconds="604800"/>
+			
+			<!-- 로그아웃시 쿠키삭제 -->
+			<security:logout logout-url="/customLogout" invalidate-session="true" delete-cookies="remember-me,JSESSION_ID"/>
+		
+		</security:http>
+		
+		<security:authentication-manager>			
+			<security:authentication-provider user-service-ref="customUserDetailsService">
+				<security:password-encoder ref="bcryptPasswordEncoder"/>	 						
+			</security:authentication-provider>
+		</security:authentication-manager>
+		
+</beans>

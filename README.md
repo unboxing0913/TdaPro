@@ -752,3 +752,103 @@ ReviewServiceImpl 처리
 ---> 어제 사용된 파일의 목록을 얻어온뒤 해당폴더의 파일목록에서 데이터베이스에 없는 파일을 찾아내 삭제하는순서로 구성
 ---> 매일 새벽2시에 작동하도록 Task 설정
 	
+	
+
+■■■■■■■■■■■■■■■2021-07-02 , 2021-07-05■■■■■■■■■■■■■■■
+
+로그인 체크 를 하기위한 Spring Web Security를 사용
+---> Spring Web Security를 사용하기위해 라이브러리 다운로드 및 설정
+---> Spring BeanConfigurationFile 메뉴를 사용해 security-context.xml을 생성해 만들어준다 (네임스페이스에서 security항목체크)
+---> 네임스페이스 추가시 5.0 네임스페이스에서 문제가 발생하기때문에 (4.2까지허용가능) 버전을 지워준다.
+---> web.xml 설정 (시큐리티 필터 , 시큐리티를 로딩하도록)
+---> security.context.xml 안에는 동작을위해 Authentication Manager 생성 , 시큐리티 시작지점 설정
+
+
+
+로그인과 회원가입 페이지 (만들어서 테스트해두었던것) 이름바꿔작성
+---> 로그인창과 회원가입창 헤더푸터 나누어서 코드 깔끔히 정리
+---> 로그인창과 회원가입창의 input 태그의 name을 스프링 시큐리티에 맞게 수정
+
+테스트를 위한 sample컨트롤러 생성
+테스트를 위한 sample  폴더안의 권한이 다른 jsp 추가 all , admin , member
+
+실제 로그인 처리와 로그아웃 , 접근 제한 메시지처리를 위한 CommonController와 accessError jsp 설정
+----> 접근제한 시큐리티처리  ( 보다 다양한 처리를 하기위한 AccessDeniedHandler 인터페이스를 직접구현 )
+
+관리자 계정 , 매니저 계정 , 일반 계정 들의 각 로그인마다 다른형태를 구현할수있도록 AuthenticationSuccessHandler 구현
+---> security패키지안에 CustomLoginSuccessHandler 클래스 생성
+
+기존 화면과 컨트롤러에 시큐리티 관련 내용추가
+Ajax부분 변경
+
+▶member테이블 설계 (회원정보)
+create table member(
+    userid varchar2(50) not null primary key,
+    userpw varchar2(100) not null,
+    username varchar2(100) not null,
+    regdate date default sysdate,
+    updatedate date default sysdate,
+    enabled char(1) default '1'
+    );
+
+▶member_auth테이블 설계 (권한관련)
+create table member_auth(
+    userid varchar2(50) not null,
+    auth varchar2(50) not null,
+    constraint fk_member_auth foreign key(userid) references member(userid)
+);
+---> fk 설정으로 member테이블과 조인
+
+테이블안의 임시 계정 추가
+id : admin , pw : pw  
+id : user 1~10 , pw : pw1~10
+id : manager 1~10 , pw : pw1~10
+
+
+테이블에 맞추어서 MemberVO와 AuthVO 클래스 추가
+
+
+BCrytPasswordEncoder 클래스를 이용한 패스워드보호 (시큐리티 의 API에 포함되어있다)
+---> security-context.xml에 설정	
+---> memberTests 를 만들어 PassWordEncoder 클래스를 이용해 테이블 안의 패스워드가 보호되는지 확인
+---> 생성된 사용자에 대한 권한 추가
+
+UserDetailsService 활용
+---> 객체를 인증과 권한 체크에 활용할수 있게하기위함
+---> MyBatis를 이용하는 MemberMapper와 서비스를 작성해 스프링시큐리티와 연결해서 사용하기위한 방식으로 진행
+
+회원 도메인 회원 Mapper 설계
+---> 데이터베이스 테이블에 맞춰서 MemberVO, AuthVO 설계
+---> MyBatis를 사용하기위한 MemberMapper 작성
+---> member와 member_auth 테이블을 조인해서 처리할수잇는방식으로 MyBatis의 ResultMap 기능 사용
+
+MemberMapper테스트
+
+MemberMapper타입의 인스턴스를 주입받아 실제기능을 구현하기위한 UserDetailsService 인터페이스를 구현한 CustomUserDetailsService클래스 생성
+--->security-context.xml 안의 추가 설정
+
+MemberVO를 UserDetails 타입으로 변환
+---> 새로운 패키지 security.domain 안에 CustomUser 클래스를 만들어주도록한다.
+---> User 를 상속받아 MemberVO를 피라미터로 전달해 User클래스에 맞게 생성자를 호출
+---> 변경후 CustomuserDetailsService에서 CustomUser를 반환하도록 수정
+
+자동로그인 기능 구현
+---> 자동로그인 데이터베이스 설계 (시큐리티 공식문서에 나오는 테이블)
+create table persistent_logins(
+	username varchar2(64) not null,
+	series varchar2(64) primary key,
+	token varchar2(64) not null,
+	last_used timestamp not null
+);
+--->security-context.xml 안의 추가 설정
+
+
+로그아웃시 쿠키삭제 기능 구현
+
+
+어노테이션을 이용해 스프링 시큐리티 세부설정
+---> servlet-context 에 security 네임스페이스를 추가 (버전 낮춤)
+
+	
+☞시큐리티 첫사용으로 예상치못한 오류 상당수 발생해 작업기간이 길어짐
+   내일부터는 바로 게시판들과 시큐리티를 접목시키는 작업 예정

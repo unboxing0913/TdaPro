@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page session="false" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -37,22 +38,30 @@
 	<nav class="py-2 bg-light border-bottom">
 		<div class="container d-flex flex-wrap">
 			<ul class="nav me-auto">
-				<li class="nav-item"><a href="#"
+				<li class="nav-item"><a href="/"
 					class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
 				<li class="nav-item"><a href="#"
+					class="nav-link link-dark px-2">오시는길</a></li>
+				<li class="nav-item"><a href="/notice/list"
 					class="nav-link link-dark px-2">공지사항</a></li>
 				<li class="nav-item"><a href="#"
-					class="nav-link link-dark px-2">견적게시판</a></li>
-				<li class="nav-item"><a href="#"
-					class="nav-link link-dark px-2">샘플게시판</a></li>
-				<li class="nav-item"><a href="#"
+					class="nav-link link-dark px-2">완공게시판</a></li>
+				<li class="nav-item"><a href="/review/list"
 					class="nav-link link-dark px-2">후기</a></li>
 			</ul>
 			<ul class="nav">
-				<li class="nav-item"><a href="#"
-					class="nav-link link-dark px-2">Login</a></li>
-				<li class="nav-item"><a href="#"
-					class="nav-link link-dark px-2">Sign up</a></li>
+			
+			<!-- 로그인 / 로그아웃 헤더 설정 -->
+			<sec:authorize access="isAnonymous()">	
+				<li class="nav-item">
+				<a href="/customLogin" class="nav-link link-dark px-2">Login</a></li>
+			</sec:authorize>	
+			<sec:authorize access="isAuthenticated()">	
+				<li class="nav-item">
+				<a href="/customLogout" class="nav-link link-dark px-2">LogOut</a></li>	
+			</sec:authorize>		
+			
+				<li class="nav-item"><a href="/customSignUp" class="nav-link link-dark px-2">Sign up</a></li>
 			</ul>
 		</div>
 	</nav>

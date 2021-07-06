@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!-- header -->
 <%@include file="../includes/header.jsp" %>
@@ -30,7 +31,8 @@
 		</div>
 		<br>
 		<div class="from-group">
-			<label>작성자</label><input class="form-control" name="writer">
+			<label>작성자</label><input class="form-control" name="writer" value='<sec:authentication property="principal.username"/>' readonly="readonly">
+			<!-- 작성자는 로그인한 작성자가 출력되게하고 읽기전용으로 수정 -->
 		</div>
 		<hr>
 		
@@ -166,6 +168,9 @@ $(document).ready(function(e){
 		uploadUL.append(str);
 	}
 	
+	//시큐리티처리를 위한 csrf 정보 
+	var csrfHeaderName="${_csrf.headerName}";
+	var csrfTokenValue="${_csrf.token}";
 	
 	//file추가시 검사
 	$("input[type='file']").change(function(e){
@@ -181,11 +186,16 @@ $(document).ready(function(e){
 			formData.append("uploadFile",files[i]);		
 		}
 		
+	//시큐리티 적용시 POST , PUT , PATCH , DELETE 와 같은 방식으로 데이터를 전송하는경우 'X-CSRF-TOKEN'과 같은 헤더정보를 추가해 CSRF토큰값을 전달하도록 해야한다.
 		
+		//게시물등록 POST처리이기때문에 토큰처리
 		$.ajax({
 			url:'/review/uploadAjaxAction',
 			processData : false,
 			contentType : false,
+			beforSend:function(xhr){
+				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue); // CSRF토큰 값을 전달
+			},
 			data: formData,
 			type: 'POST',
 			dataType: 'json',
@@ -196,7 +206,7 @@ $(document).ready(function(e){
 		});
 		
 	})
-	
+		
 	//업로드된 파일에 휴지통 버튼 클릭시 삭제
 	$(".uploadResult").on("click","button",function(e){
 		console.log("파일 삭제");
@@ -206,9 +216,13 @@ $(document).ready(function(e){
 		
 		var targetLi = $(this).closest("li");
 		
+		// 첨부파일 제거 역시 POST  이기때문에 토큰처리
 		$.ajax({
 			url: '/review/deleteFile',
 			data : {fileName: targetFile, type: type},
+			beforSend:function(xhr){
+				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue); // CSRF토큰 값을 전달
+			},
 			dataType:'text',
 			type:'POST',
 			success:function(result){

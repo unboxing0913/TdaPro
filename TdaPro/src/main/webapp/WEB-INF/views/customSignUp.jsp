@@ -10,25 +10,25 @@
 
 <h3 class="h-txt">회원가입</h3>
   
-<form role="form" method="post" action""> 
+<form method="post" action="/member/register"> 
  
   <label>
     <p class="label-txt">아이디 입력</p>
-    <input type="text" class="input">
+    <input type="text" class="input" name="userid">
     <div class="line-box">
       <div class="line"></div>
     </div>
   </label>
   <label>
     <p class="label-txt">이름</p>
-    <input type="text" class="input">
+    <input type="text" class="input" name="username">
     <div class="line-box">
       <div class="line"></div>
     </div>
   </label>
   <label>
     <p class="label-txt">비밀번호</p>
-    <input type="text" class="input">
+    <input type="password" class="input" name="userpw">
     <div class="line-box">
       <div class="line"></div>
     </div>

@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!-- upload css -->
 <link href="/resources/css/upload_css.css" rel="stylesheet" type="text/css">
@@ -22,6 +23,9 @@
 <div class="col-lg-12 col-md-12 col-sm-12">
 	
 	<form role="form" action="/review/modify" method="post">
+		
+		<!-- POST방식이 처리되는 부분이므로 CSRF 토큰 추가 -->
+		<input type="hiiden" name="${_csrf.parameterName}" value="${_csrf.token }"/>
 		
 		<!-- 페이징처리를 위한 hidden타입의 input -->
 		<input type='hidden' name="pageNum" value='<c:out value="${cri.pageNum }"/>'>
@@ -60,10 +64,16 @@
 		<br>
 		
 		
+		<!-- 조회와 마찬가지로 현재 로그인 한 사용자가 게시물의 작성자인 경우에만 수정/삭제가 가능하도록 제어 -->
 		
+		<sec:authentication property="principal" var="pinfo"/>
+		<sec:authorize access="isAuthenticated()">
+			<c:if test="${prinfo.username eq board.writer}">
+				<button type="submit" data-oper='modify' class="btn btn-primary btn-lg">수정</button>
+				<button type="submit" data-oper='remove' class="btn btn-danger btn-lg">삭제</button>
+			</c:if>
+		</sec:authorize>
 		
-		<button type="submit" data-oper='modify' class="btn btn-primary btn-lg">수정</button>
-		<button type="submit" data-oper='remove' class="btn btn-danger btn-lg">삭제</button>
 		<button type="submit" data-oper='list' class="btn btn-secondary btn-lg">목록으로</button>
 	
 	</form>
@@ -235,6 +245,9 @@ $(document).ready(function(){
 		uploadUL.append(str);
 	}
 	
+	//시큐리티처리를 위한 csrf 정보 
+	var csrfHeaderName="${_csrf.headerName}";
+	var csrfTokenValue="${_csrf.token}";
 	
 	//file추가시 검사
 	$("input[type='file']").change(function(e){
@@ -257,6 +270,9 @@ $(document).ready(function(){
 			contentType : false,
 			data: formData,
 			type: 'POST',
+			beforSend:function(xhr){
+				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue); // CSRF토큰 값을 전달
+			},
 			dataType: 'json',
 			success:function(result){
 				console.log(result);

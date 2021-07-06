@@ -21,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -72,12 +73,14 @@ public class ReviewController {
 	
 	//화면에서 확인하기위해 get방식 매핑 적용	
 	@GetMapping("/register")
+	@PreAuthorize("isAuthenticated()") //어노테이션을 통한 권한설정(로그인이 성공한 사용자만)
 	public void register() {
 		
 	}
 	
 	
 	@PostMapping("/register")
+	@PreAuthorize("isAuthenticated()") //어노테이션을 통한 권한설정(로그인이 성공한 사용자만)
 	public String register(ReviewVO board, RedirectAttributes rttr) {
 		//RedirectAttributes의 addFlashAttribute경우 일회성데이터를 전달하기때문에 중복처리하기 좋음
 		log.info("register : "+board);
@@ -126,6 +129,7 @@ public class ReviewController {
 		return "redirect:/review/list";
 	}
 	*/
+	@PreAuthorize("principal.username == #board.writer") //작성자 id가 로그인한 사용자와 같을경우 권한설정
 	@PostMapping("/modify")
 	public String modify(ReviewVO board,RedirectAttributes rttr,Criteria cri) {
 		log.info("modify : "+board);
@@ -181,7 +185,8 @@ public class ReviewController {
 	//게시글 삭제
 	//삭제전 첨부파일 목록확보 후 게시물 과 첨부파일데이터 삭제 -> 삭제성공후 실제파일의 삭제
 	@PostMapping("/remove")
-	public String remove(@RequestParam("bno") Long bno,@ModelAttribute("cri")Criteria cri , RedirectAttributes rttr, String writer) {
+	@PreAuthorize("principal.username == writer") //작성자 id가 로그인한 사용자와 같을경우 권한설정
+	public String remove(@RequestParam("bno") Long bno,@ModelAttribute("cri")Criteria cri , RedirectAttributes rttr, String writer) { //조사하기위한 작성자 writer를 받아옴
 		log.info("remove..."+bno);
 		
 		List<ReviewAttachVO> attachList = service.getAttachList(bno); //첨부파일 목록 확보
@@ -310,6 +315,7 @@ public class ReviewController {
 	//파일 업로드시 매핑 + 업로드된 파일 반환하기위한 구조변경
 	@PostMapping(value="/uploadAjaxAction", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody
+	@PreAuthorize("isAuthenticated()") // 로그인한 사용자만이 등록할수있게 처리
 	public ResponseEntity<List<ReviewAttachVO>> uploadAjaxPost(MultipartFile[] uploadFile) {
 		
 		List<ReviewAttachVO> list = new ArrayList<>(); // 추가된 구조 (추가하기위한 리스트생성)
@@ -449,6 +455,7 @@ public class ReviewController {
 	//(등록시)첨부파일 삭제
 	@PostMapping("/deleteFile")
 	@ResponseBody
+	@PreAuthorize("isAuthenticated()") // 로그인한 사용자만이 첨부파일 삭제할수있도록 처리
 	public ResponseEntity<String> deletFiles(String fileName, String type) {
 		log.info("삭제 파일 ---> " + fileName);
 		
@@ -479,14 +486,5 @@ public class ReviewController {
 		return new ResponseEntity<>(service.getAttachList(bno),HttpStatus.OK);
 	}
 	
-	@GetMapping("/test")
-	public void test() {
-		
-	}
-	
-	@GetMapping("/test2")
-	public void test2() {
-		
-	}
 
 }

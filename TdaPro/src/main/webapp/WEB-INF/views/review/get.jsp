@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!-- upload css -->
 <link href="/resources/css/upload_css.css" rel="stylesheet" type="text/css">
@@ -45,8 +47,18 @@
 			readonly="readonly" value="${board.writer}">
 	</div>
 	<hr>
+	
+	<!-- security의 정보를 가져와 pinfo에 넣어줌 -->
+	<sec:authentication property="principal" var="pinfo"/>
+	
+	<!-- 로그인한 사용자만이 수정버튼이 활성화 될수잇도록 처리 -->
+	<sec:authorize access="isAuthenticated()">
+		<c:if test="${pinfo.username eq board.writer}">  <!-- 아이디가 작성자와 같은 회원일경우만 수정버튼 활성화(username은 시큐리티에서 id)  -->
+			<button class="btn btn-primary btn-lg" data-oper='modify'>수정하기</button>
+		</c:if>	
+	</sec:authorize>
 
-	<button class="btn btn-primary btn-lg" data-oper='modify'>수정하기</button>
+	
 	<button class="btn btn-secondary btn-lg" data-oper='list'>목록으로</button>
 
 	<!-- 수정/삭제 페이지로 보내기위한 Form 처리 -->
@@ -104,7 +116,12 @@
   			<path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM4.5 5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7zm0 2.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7zm0 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4z"/>
 		</svg>
 		댓글
-		<button id="addReplyBtn" class="btn btn-primary" style='float:right'>댓글 등록</button>
+		
+		<!-- 로그인 한 사용자만 댓글등록 버튼 활성화 -->
+		<sec:authorize access="isAuthenticated()">
+			<button id="addReplyBtn" class="btn btn-primary" style='float:right'>댓글 등록</button>
+		</sec:authorize>
+		
 		</div>
 		<div class="card-body">
 			<ul class="chat">
@@ -139,7 +156,7 @@
 					<label>내용</label> <input class="form-control" name='reply' value='New Reply!!!!'>
 				</div>
 				<div class="form-group">
-					<label>작성자</label> <input class="form-control" name='replyer' value='replyer'>
+					<label>작성자</label> <input class="form-control" name='replyer' value='replyer' readonly="readonly">
 				</div>
 				<div class="form-group">
 					<label>날짜</label> <input class="form-control" name='replyDate' value=''>
@@ -341,10 +358,22 @@ $(document).ready(function(){
 	var modalRemoveBtn = $('#modalRemoveBtn');
 	var modalRegisterBtn = $('#modalRegisterBtn');
 	
+	var replyer = null; // 시큐리시 댓글/수정 시 서버쪽에서도 작성자를 사용할수있도록 만들어줌
+	
+	//스프링 시큐리티의 username을 replyer라는 변수로 처리할수있도록
+	<sec:authorize access="isAuthenticated()">
+		replyer = '<sec:authentication property="principal.username"/>';
+	</sec:authorize>
+	
+	//시큐리티처리를 위한 csrf 정보 
+	var csrfHeaderName="${_csrf.headerName}";
+	var csrfTokenValue="${_csrf.token}";
+	
 	//댓글 등록 버튼 클릭시 modal창 보이기
 	$("#addReplyBtn").on("click",function(e){
 		
 		modal.find("input").val("");;
+		modal.find("input[name='replyer']").val(replyer); // 현재 로그인한 사용자의 이름으로 고정되도록
 		modalInputReplyDate.closest("div").hide();
 		modal.find("button[id!='modalCloseBtn']").hide();
 		modalRegisterBtn.show();
@@ -352,6 +381,10 @@ $(document).ready(function(){
 		$(".modal").modal("show");
 	});
 	
+	// Ajax로 토큰을 전송하는 방식이 아닌 기본설정으로 토큰을 전송하는 방식
+	$(document).ajaxSend(function(e,xhr,options){
+		xhr.setRequestHeader(csrfHeaderName,csrfTokenValue); 
+	});
 	
 	//댓글 등록 처리
 	modalRegisterBtn.on("click",function(e){
@@ -393,10 +426,29 @@ $(document).ready(function(){
 	
 	//댓글 수정 이벤트처리 (모달창에있는 data-rno 값으로)
 	modalModBtn.on("click",function(e){
+		
+		var originalReplyer = modalInputReplyer.val();
+		
+		//기존의 작성자까지 같이전송
 		var reply = {
 				rno : modal.data("rno"),
-				reply : modalInputReply.val()
+				reply : modalInputReply.val(),
+				replyer : originalReplyer
 			};
+		
+		if(!replyer){
+			alert("로그인후 수정이 가능합니다");
+			modal.modal("hide");
+			return;
+		}
+		
+		console.log("Original Replyer : "+originalReplyer); // 댓글의 원래 작성자
+		
+		if(replyer != originalReplyer){
+			alert("자신이 작성한 댓글만 수정이 가능합니다");
+			modal.modal("hide");
+			return;
+		}
 		
 		review_replyService.update(reply,function(result){
 			alert(result);
@@ -410,7 +462,25 @@ $(document).ready(function(){
 	modalRemoveBtn.on("click",function(e){
 		var rno = modal.data("rno");
 		
-		review_replyService.remove(rno,function(result){
+		console.log("RNO : " +rno);
+		console.log("REPLYER : "+replyer);
+		
+		if(!replyer){
+			alert("로그인후 삭제가 가능합니다");
+			modal.modal("hide");
+			return;
+		}
+		
+		var originalReplyer = modalInputReplyer.val();
+		console.log("Original Replyer : "+originalReplyer); // 댓글의 원래 작성자
+		
+		if(replyer != originalReplyer){
+			alert("자신이 작성한 댓글만 삭제가 가능합니다");
+			modal.modal("hide");
+			return;
+		}
+		
+		review_replyService.remove(rno,originalReplyer,function(result){
 			alert(result);
 			modal.modal("hide");
 			//showList(1);

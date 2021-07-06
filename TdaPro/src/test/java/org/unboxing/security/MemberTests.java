@@ -67,7 +67,7 @@ public class MemberTests {
 	public void testAuth() {
 		String sql = "insert into member_auth(userid,auth) values (?,?)";
 		
-		for(int i=1;i<=10;i++) {
+		for(int i=11;i<=20;i++) {
 		
 		Connection con = null;
 		PreparedStatement pstmt = null;

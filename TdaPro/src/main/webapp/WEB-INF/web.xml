@@ -64,6 +64,7 @@
 
 	</servlet>
 	
+	<!-- 한글문제 UTF-8 처리와 시큐리티 필터 적용은 순서에 주의해야한다 -->
 	<!-- 한글문제 UTF-8 필터처리 -->
 	<filter>
 		<filter-name>encoding</filter-name>

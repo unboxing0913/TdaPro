@@ -1,10 +1,9 @@
 package org.unboxing.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType; //MeadiaType
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +34,8 @@ public class Review_ReplyController {
 // @PathVariable("") : URL 경로에 있는 값을 파라미터로 추출하려고 할때 사용 
 	
 	
+	
+	@PreAuthorize("isAuthenticated()") //로그인한 사용자만 작성할수있게
 	//댓글 등록처리
 	@PostMapping(value="/new",
 			consumes = "application/json",
@@ -92,20 +93,23 @@ public class Review_ReplyController {
 	
 	//댓글 삭제
 	@DeleteMapping(value="/{rno}",produces= {MediaType.TEXT_PLAIN_VALUE })
-	public ResponseEntity<String> remove(@PathVariable("rno") Long rno){
+	@PreAuthorize("principal.username == #vo.replyer") // replyer이름이 같을경우에 삭제허용
+	public ResponseEntity<String> remove(@PathVariable("rno") Long rno,@RequestBody Review_ReplyVO vo){
 		
 		log.info("remove : "+rno);
+		
+		log.info("replyer : "+vo.getReplyer());
 		
 		return service.remove(rno) == 1 ? new ResponseEntity<>("success",HttpStatus.OK) 
 				                        : new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	
-	//댓글 수정
+	//댓글수정
 	@RequestMapping(method= {RequestMethod.PUT,RequestMethod.PATCH},
 			    value="/{rno}",
 			    consumes="application/json",
-			    produces= {MediaType.TEXT_PLAIN_VALUE })
+			    produces= {MediaType.TEXT_PLAIN_VALUE }) 
+	@PreAuthorize("principal.username == #vo.replyer")  //replyer이름이 같을경우에 삭제허용
 	public ResponseEntity<String> modify(
 			@RequestBody Review_ReplyVO vo,
 			@PathVariable("rno") Long rno){

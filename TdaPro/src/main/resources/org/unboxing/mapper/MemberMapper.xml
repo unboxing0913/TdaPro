@@ -30,4 +30,12 @@ SELECT
 	member mem LEFT OUTER JOIN member_auth auth on mem.userid = auth.userid where mem.userid = #{userid}
 </select>
 
+<insert id="register">
+	insert into member (userid,userpw,username) values(#{userid},#{userpw},#{username})
+</insert>
+
+<insert id="registerAuth">
+	insert into member_auth(userid,auth) values(#{userid},#{auth})
+</insert>
+
 </mapper>

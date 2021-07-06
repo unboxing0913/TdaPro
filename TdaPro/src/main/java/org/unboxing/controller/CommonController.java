@@ -11,6 +11,8 @@ import lombok.extern.log4j.Log4j;
 @Log4j
 public class CommonController {
 
+	
+	
 	//접근제한 매핑
 	@GetMapping("/accessError")
 	public void accessDenied(Authentication auth,Model model) {
@@ -26,16 +28,25 @@ public class CommonController {
 		log.info("logout:"+logout);
 		
 		if(error != null) {
-			model.addAttribute("error","Login Error Check Your Account");
+			model.addAttribute("error","아이디 또는 비밀번호가 잘못되었습니다");
 		}
 		if(logout != null) {
-			model.addAttribute("logout","Logout!!");
+			model.addAttribute("logout","로그아웃 하셨습니다");
 		}
 	}
 	
+	//로그아웃 매핑
 	@GetMapping("/customLogout")
 	public void logoutGET() {
 		log.info("custom logout");
 	}
+	
+	//회원가입 페이지 매핑
+	@GetMapping("/customSignUp")
+	public void customSignUp() {
+		
+	}
+	
+
 	
 }

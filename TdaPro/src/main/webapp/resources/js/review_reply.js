@@ -51,12 +51,16 @@ var review_replyService = (function(){
 	
 	
 	
-	function remove(rno,callback,error){
+	function remove(rno,replyer,callback,error){
 		console.log("삭제 처리");
 		
 		$.ajax({
 				type : 'delete',
 				url : '/review/replies/'+rno,
+				
+				data: JSON.stringify({rno:rno , replyer:replyer}),
+				contentType:"application/json; charset=utf8",
+				
 				success : function(deleteResult,status,xhr){
 					if(callback){
 						callback(deleteResult);

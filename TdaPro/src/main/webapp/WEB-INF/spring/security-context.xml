@@ -10,8 +10,8 @@
 		<!-- 접근제한 핸들러 빈 -->
 		<bean id="customAccessDenied" class="org.unboxing.security.CustomAccessDeniedHandler"></bean>
 		
-		<!-- 로그인성공후 담당 핸들러 빈 -->
-		<bean id="customLoginSuccess" class="org.unboxing.security.CustomLoginSuccessHandler"></bean>
+		<!-- 로그인성공후 담당 핸들러 빈 
+		<bean id="customLoginSuccess" class="org.unboxing.security.CustomLoginSuccessHandler"></bean>-->
 		
 		<!-- BCrytPasswordEncoder  설정 (패스워드 보호) -->
 		<bean id ="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
@@ -23,18 +23,18 @@
 		<security:http>
 		   	
 		   	<!-- 테스트용 -->
-		    <security:intercept-url pattern="/sample/all" access="permitAll"/>
+		    <!-- <security:intercept-url pattern="/sample/all" access="permitAll"/>
 			<security:intercept-url pattern="/sample/member" access="hasRole('ROLE_MEMBER')"/>
-			<security:intercept-url pattern="/sample/admin" access="hasRole('ROLE_ADMIN')"/>
+			<security:intercept-url pattern="/sample/admin" access="hasRole('ROLE_ADMIN')"/> -->
 			
 			<!--접근제한 메시지 처리  -->		    
-			 <security:access-denied-handler ref="customAccessDenied"/> <!-- 접근제한 핸들러구현 -->
+			<security:access-denied-handler ref="customAccessDenied"/> <!-- 접근제한 핸들러구현 -->
 				
-			<!--로그인 페이지 설정 + 로그인성공후 처리를 담당하는 핸들러-->
-			<security:form-login login-page="/customLogin" authentication-success-handler-ref="customLoginSuccess"/>
+			<!--로그인 페이지 설정 -->
+			<security:form-login login-page="/customLogin"/> 
 			
 			<!-- 로그아웃성공후 처리를 담당하는 핸들러 -->
-			<security:logout logout-url="/customLogout" invalidate-session="true"/>
+		    <security:logout logout-url="/customLogout" invalidate-session="true"/>
 			
 			<!-- 자동로그인을 위한 설계 -->
 			<security:remember-me data-source-ref="dataSource" token-validity-seconds="604800"/>

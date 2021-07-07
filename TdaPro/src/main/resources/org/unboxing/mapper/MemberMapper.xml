@@ -9,7 +9,7 @@
 	<id property="userid" column="userid" />
 	<result property="userid" column="userid"/>
 	<result property="userpw" column="userpw"/>
-	<result property="userName" column="userName"/>
+	<result property="username" column="userName"/>
 	<result property="regDate" column="regDate"/>
 	<result property="updateDate" column="updateDate"/>
 	<collection property="authList" resultMap="authMap">
@@ -30,12 +30,14 @@ SELECT
 	member mem LEFT OUTER JOIN member_auth auth on mem.userid = auth.userid where mem.userid = #{userid}
 </select>
 
-<insert id="register">
-	insert into member (userid,userpw,username) values(#{userid},#{userpw},#{username})
+<insert id="register" parameterType="org.unboxing.domain.MemberVO">
+	insert into member (userid,userpw,userName)
+	values(#{userid},#{userpw},#{username})
 </insert>
-
-<insert id="registerAuth">
+<insert id="registerAuth" parameterType="org.unboxing.domain.AuthVO">
 	insert into member_auth(userid,auth) values(#{userid},#{auth})
 </insert>
+
+
 
 </mapper>

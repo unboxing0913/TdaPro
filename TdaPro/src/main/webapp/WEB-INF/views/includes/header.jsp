@@ -5,6 +5,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,7 +31,6 @@
 
 
 
-
 <body>
 
 	<div class="b-example-divider"></div>
@@ -40,11 +40,11 @@
 			<ul class="nav me-auto">
 				<li class="nav-item"><a href="/"
 					class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
-				<li class="nav-item"><a href="#"
+				<li class="nav-item"><a href="/maps"
 					class="nav-link link-dark px-2">오시는길</a></li>
 				<li class="nav-item"><a href="/notice/list"
 					class="nav-link link-dark px-2">공지사항</a></li>
-				<li class="nav-item"><a href="#"
+				<li class="nav-item"><a href="/completion/list"
 					class="nav-link link-dark px-2">완공게시판</a></li>
 				<li class="nav-item"><a href="/review/list"
 					class="nav-link link-dark px-2">후기</a></li>

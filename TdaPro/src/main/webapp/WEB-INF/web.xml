@@ -67,7 +67,7 @@
 	<!-- 한글문제 UTF-8 처리와 시큐리티 필터 적용은 순서에 주의해야한다 -->
 	<!-- 한글문제 UTF-8 필터처리 -->
 	<filter>
-		<filter-name>encoding</filter-name>
+		<filter-name>encodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
 		<init-param>
 			<param-name>encoding</param-name>
@@ -76,11 +76,10 @@
 	</filter>
 	
 	<filter-mapping>
-		<filter-name>encoding</filter-name>
-		<servlet-name>appServlet</servlet-name>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
-	<!-- 시큐리티 필터사용  -->
+	<!-- 시큐리티필터 -->
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>

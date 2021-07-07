@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.unboxing.mapper.CompletionAttachMapper">
+
+<!-- 첨부파일 등록 -->
+<insert id="insert">
+	insert into completion_attach(uuid,uploadpath,filename,filetype,bno)
+	values (#{uuid},#{uploadPath},#{fileName},#{fileType},#{bno})
+</insert>
+
+<!-- 첨부파일삭제 -->
+<delete id="delete">
+	delete from completion_attach where uuid = #{uuid}
+</delete>
+
+<!-- 특정게시물번호 찾기 -->
+<select id="findByBno" resultType="org.unboxing.domain.CompletionAttachVO">
+	select * from completion_attach where bno = #{bno}
+</select>
+
+<!-- 첨부파일 전체삭제 -->
+<delete id="deleteAll">
+	delete completion_attach where bno = #{bno}
+</delete>
+
+<!-- task 스케쥴러를 사용하기위한 오래된파일 검색 (어제날짜 : sysdate-1) -->
+<select id="getOldFiles" resultType="org.unboxing.domain.CompletionAttachVO">
+	select * from completion_attach where uploadpath = to_char(sysdate-1,'yyyy/mm/dd') 
+</select>
+</mapper>

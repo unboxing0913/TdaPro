@@ -31,7 +31,9 @@
     <input type="checkbox" class="btn-check" id="btncheck1" name="remember-me"></label>
   </label>
   <button type="submit" name="loginBtn">로그인</button>
-  <button type="submit" name="SignUpBtn">회원가입</button>
+  <br>
+  <br>
+  <a href="/customSignUp">회원가입</a>
   
   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }"/> <!-- 사이트간 위조 방지 목적 -->
 
@@ -48,12 +50,6 @@ $("#loginBtn").on("click",function(e){
 	$("form").submit();
 });
 
-$("#SignUpBtn").on("click",function(e){
-	e.preventDefault();
-	
-	//회원가입창으로이동
-	
-});
 
 </script>
 

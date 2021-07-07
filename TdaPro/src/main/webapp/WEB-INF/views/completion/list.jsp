@@ -9,7 +9,7 @@
 <!-- list body -->
 
 	<div class="col-lg-12">
-		<h1 class="page-header">Notice Page</h1>
+		<h1 class="page-header">Completion Page</h1>
 		<hr>
 		
 		<div class="d-grid gap-2 d-md-flex justify-content-md-end">		
@@ -36,7 +36,7 @@
 	<tbody>
 		<tr>		
 			<th scope="row"><c:out value="${board.bno}"/></th>
-			<%-- <td><a href='/notice/get?bno=<c:out value="${board.bno}"/>'><c:out value="${board.title}"/></td> 
+			<%-- <td><a href='/completion/get?bno=<c:out value="${board.bno}"/>'><c:out value="${board.title}"/></td> 
 			get.jsp -> 목록버튼 클릭시 파라미터 pageNum과 amount를 같이 전달하기위해 밑의 방법으로 <a>태그를 javaScript로 해결 --%>
 			<td>
 			<a class='move' href='<c:out value="${board.bno}"/>'><c:out value="${board.title}"/>
@@ -53,7 +53,7 @@
 </table>
 
 <!-- 검색처리 -->
-<form id='searchForm' action="/notice/list" method='get'>
+<form id='searchForm' action="/completion/list" method='get'>
 	<select name='type'>
 		<option value="" ${pageMaker.cri.type == null?"selected":"" }>--</option>
 		<option value="T" ${pageMaker.cri.type eq 'T'?"selected":"" }>제목</option>
@@ -91,7 +91,7 @@
 </div>
 
 <!-- page 이벤트 처리를 위함 ( <a>태그 대신 JavaScript ) -->
-<form id="actionForm" action="/notice/list" method="get">
+<form id="actionForm" action="/completion/list" method="get">
 	<input type="hidden" name="pageNum" value="${pageMaker.cri.pageNum}">
 	<input type="hidden" name="amount" value="${pageMaker.cri.amount}">
 	<!-- 검색후 페이지이동시 검색조건 포함 -->
@@ -147,7 +147,7 @@ $(document).ready(function(){
 	
 	//게시글 등록버튼
 	$("#regBtn").on("click",function(){
-		self.location = "/notice/register";
+		self.location = "/completion/register";
 	});
 	
 	
@@ -165,7 +165,7 @@ $(document).ready(function(){
 	 $(".move").on("click",function(e){
 		 e.preventDefault();
 	 	 actionForm.append("<input type='hidden' name='bno' value='"+$(this).attr("href")+"'>");
-	 	 actionForm.attr("action","/notice/get");
+	 	 actionForm.attr("action","/completion/get");
 	 	 actionForm.submit();
 	 }); 
 	 

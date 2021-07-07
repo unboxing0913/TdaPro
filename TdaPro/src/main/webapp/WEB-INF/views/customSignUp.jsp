@@ -10,7 +10,9 @@
 
 <h3 class="h-txt">회원가입</h3>
   
-<form method="post" action="/member/register"> 
+<form method="post" action="/customSignUp" accept-charset="utf-8"> 
+
+ <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }"/>
  
   <label>
     <p class="label-txt">아이디 입력</p>
@@ -34,6 +36,7 @@
     </div>
   </label>
   <button type="submit">가입</button>
+
 
 </form>
 </body>

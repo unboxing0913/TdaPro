@@ -15,14 +15,14 @@
 <!-- modify body -->
 <div class="row">
 	<div class="col-lg-12">
-		<h1>Review Modify Page</h1>
+		<h1>Completion Modify Page</h1>
 		<hr>
 	</div>
 </div>
 
 <div class="col-lg-12 col-md-12 col-sm-12">
 	
-	<form role="form" action="/review/modify" method="post">
+	<form role="form" action="/completion/modify" method="post">
 		
 		<!-- POST방식이 처리되는 부분이므로 CSRF 토큰 추가 -->
 		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }"/>
@@ -65,12 +65,10 @@
 		
 		
 		<!-- 조회와 마찬가지로 현재 로그인 한 사용자가 게시물의 작성자인 경우에만 수정/삭제가 가능하도록 제어 -->
-		<!-- security의 정보를 가져와 pinfo에 넣어줌 -->
+		
 		<sec:authentication property="principal" var="pinfo"/>
-	
-		<!-- 로그인한 사용자만이 버튼이 활성화 될수잇도록 처리 -->
 		<sec:authorize access="isAuthenticated()">
-			<c:if test="${pinfo.username eq board.writer}">  <!-- 아이디가 작성자와 같은 회원일경우만 수정버튼 활성화(username은 시큐리티에서 id)  -->
+			<c:if test="${pinfo.username eq board.writer}">
 				<button type="submit" data-oper='modify' class="btn btn-primary btn-lg">수정</button>
 				<button type="submit" data-oper='remove' class="btn btn-danger btn-lg">삭제</button>
 			</c:if>
@@ -123,7 +121,7 @@ $(document).ready(function(){
 	//해당 게시물의 첨부파일을 가져오는부분 (가장먼저 동작해야함)
 	(function(){
 		var bno = '<c:out value="${board.bno}"/>';
-		$.getJSON("/review/getAttachList",{bno:bno},function(arr){
+		$.getJSON("/completion/getAttachList",{bno:bno},function(arr){
 			console.log(arr);
 			var str = "";
 			
@@ -141,7 +139,7 @@ $(document).ready(function(){
 				str += "<path fill-rule='evenodd' d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z'/>";
 				str += "</svg>";
 				str += "</button><br><br>";
-				str += "<img src='/review/display?fileName="+fileCallPath+"' class='img-responsive img-thumbnail'>";
+				str += "<img src='/completion/display?fileName="+fileCallPath+"' class='img-responsive img-thumbnail'>";
 				str += "</div>";
 				str += "</li>"
 			}else{
@@ -221,7 +219,7 @@ $(document).ready(function(){
 				str += "<path fill-rule='evenodd' d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z'/>";
 				str += "</svg>";
 				str += "</button><br><br>";
-				str += "<img src='/review/display?fileName="+fileCallPath+"'class='img-responsive img-thumbnail'>";
+				str += "<img src='/completion/display?fileName="+fileCallPath+"'class='img-responsive img-thumbnail'>";
 				str += "</div>";
 				str += "</li>";
 			}else{
@@ -248,8 +246,8 @@ $(document).ready(function(){
 	}
 	
 	//시큐리티처리를 위한 csrf 정보 
-	var csrfHeaderName = "${_csrf.headerName}";
-	var csrfTokenValue = "${_csrf.token}";
+	var csrfHeaderName="${_csrf.headerName}";
+	var csrfTokenValue="${_csrf.token}";
 	
 	//file추가시 검사
 	$("input[type='file']").change(function(e){
@@ -267,13 +265,13 @@ $(document).ready(function(){
 		
 		
 		$.ajax({
-			url:'/review/uploadAjaxAction',
+			url:'/completion/uploadAjaxAction',
 			processData : false,
 			contentType : false,
 			data: formData,
 			type: 'POST',
-			beforeSend : function(xhr){
-				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
+			beforeSend:function(xhr){
+				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue); // CSRF토큰 값을 전달
 			},
 			dataType: 'json',
 			success:function(result){
@@ -297,10 +295,10 @@ $(document).ready(function(){
 		console.log(operation);
 		
 		if(operation === 'remove'){ 
-			formObj.attr("action","/review/remove"); //삭제
+			formObj.attr("action","/completion/remove"); //삭제
 			
 		}else if(operation === 'list'){
-			formObj.attr("action","/review/list").attr("method","get");
+			formObj.attr("action","/completion/list").attr("method","get");
 			
 			//페이징 처리 부분
 			var pageNumTag = $("input[name='pageNum']").clone(); //clone()을 사용해 새로만든 var에 내용을 저장

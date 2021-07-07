@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.unboxing.mapper.NoticeMapper">
+
+<!-- sql 일부를 별도보관 하고 include 시키는 형태로 사용하기위함 (검색처리 부분) -->
+<sql id="criteria">
+<trim prefix="(" suffix=") AND">
+		<foreach collection="typeArr" item="type" separator="OR">
+		 	<!-- OGNL 표현식 
+		 		 검색조건 T : title이 키워드인 항목 검색
+		 		 검색조건 C : content가 키워드인 항목 검색
+		 		 검색조건 W : writer가 키워드인 항목 검색 -->
+		 		 
+			<if test="type == 'T'.toString()">
+				title like '%'||#{keyword}||'%'
+			</if>
+			<if test="type == 'C'.toString()">
+				content like '%'||#{keyword}||'%'
+			</if>
+			<if test="type == 'W'.toString()">
+				writer like '%'||#{keyword}||'%'
+			</if>
+		</foreach>
+</trim>
+</sql>
+
+
+
+<!-- 목록보기 -->
+<select id="getList" resultType="org.unboxing.domain.NoticeVO">
+<!-- 비교연산자 , 부등호 사용하기위한 CDATA 사용 -->
+<![CDATA[
+select * from notice_board where bno > 0 
+]]>
+</select>
+
+
+<!-- 페이징처리 -->
+<select id="getListWithPaging" resultType="org.unboxing.domain.NoticeVO">
+<![CDATA[
+select 
+	bno , title , content , writer , regdate , updatedate , replyCnt
+	from(
+		select
+			/*+INDEX_DESC(notice_board pk_notice_board)*/
+ 			rownum rn , bno , title , content , writer , regdate , updatedate , replyCnt
+			from notice_board where 
+]]>
+
+<!-- 페이징처리 안에 추가되는 검색처리 -->
+<include refid="criteria"/>
+
+
+<![CDATA[			
+			rownum <= #{pageNum} * #{amount}
+		)
+	where rn > (#{pageNum}-1) * #{amount}
+]]>
+</select>
+
+
+
+<!-- 전체 데이터개수를 구하기위한 SQL문 -->
+<select id="getTotalCount" resultType="int">
+	select count(*) from notice_board where bno > 0
+</select>
+
+
+<!-- C (create) -->
+<insert id="insert">
+	insert into notice_board (bno,title,content,writer)
+	values (nt_seq_board.nextval,#{title},#{content},#{writer})
+</insert>
+
+<insert id="insertSelectKey">
+	<selectKey keyProperty="bno" order="BEFORE" resultType="long">
+		select nt_seq_board.nextval from dual
+	</selectKey>
+	insert into notice_board (bno,title,content,writer)
+	values (#{bno},#{title},#{content},#{writer})
+</insert>
+
+
+<!-- R (read) -->
+<select id="read" resultType="org.unboxing.domain.NoticeVO">
+	select * from notice_board where bno = #{bno}
+</select>
+
+
+<!-- U (update) -->
+<update id="update">
+	update notice_board set
+	title = #{title},
+	content = #{content},
+	writer = #{writer},
+	updateDate = sysdate
+	where bno = #{bno}
+</update>
+
+
+<!-- D (delete)-->
+<delete id="delete">
+	delete from notice_board where bno = #{bno}
+</delete>
+
+
+
+<!-- 현재 게시글의 총 댓글수를 구함 -->
+<update id="updateReplyCnt">
+	update notice_board set replycnt = replycnt + #{amount} where bno = #{bno}
+</update>
+</mapper>

@@ -1,9 +1,12 @@
 package org.unboxing.service;
 
+import org.unboxing.domain.AuthVO;
+import org.unboxing.domain.MemberVO;
+
 public interface MemberService {
 	
-	public void register(String userid,String userpw,String username); 
+	public void register(MemberVO vo); 
 	
-	public void registerAuth(String userid,String auth);
+	public void registerAuth(AuthVO vo);
 	
 }

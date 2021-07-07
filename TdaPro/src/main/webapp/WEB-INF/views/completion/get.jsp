@@ -14,7 +14,7 @@
 <!-- get body -->
 <div class="row">
 	<div class="col-lg-12">
-		<h1>Notice Read Page</h1>
+		<h1>Completion Read Page</h1>
 		<hr>
 	</div>
 </div>
@@ -64,7 +64,7 @@
 	<!-- 수정/삭제 페이지로 보내기위한 Form 처리 -->
 
 
-	<form id='operForm' action="/notice/modify" method="get">
+	<form id='operForm' action="/completion/modify" method="get">
 		<input type="hidden" id='bno' name='bno'
 			value='<c:out value="${board.bno}"/>'>
 
@@ -180,10 +180,65 @@
 <!-- footer -->
 <%@include file="../includes/footer.jsp" %>
 
-<!-- Notice_Reply script -->
-<script type="text/javascript" src="/resources/js/notice_reply.js"></script>
+<!-- completion_Reply script -->
+<script type="text/javascript" src="/resources/js/completion_reply.js"></script>
+
+<!-- completion_reply.js 전송방식 테스트 -->
+<script>
+/*
+console.log("completion_reply.js Test")
+
+var bnoValue='<c:out value="${board.bno}"/>';
 
 
+//등록테스트
+completion_replyService.add({
+			reply:"JS TEST",
+			replyer:"tester",
+			bno:bnoValue
+		},function(result){
+			alert("Result:"+result);
+		});
+
+
+//목록처리 테스트
+completion_replyService.getList({bno:bnoValue,page:1},function(list){
+	for(var i = 0, len = list.length||0 ; i < len ; i ++){
+		console.log(list[i]);
+	}
+});
+
+
+
+//삭제 처리 테스트(실제 존재하는 번호로 테스트)
+completion_replyService.remove(13,function(count){
+	console.log(count);
+		if(count === "success"){
+			alert("REMOVE");
+		}
+	},function(err){
+		alert("ERROR");
+	});
+
+
+//수정처리 테스트
+completion_replyService.update({
+	rno:11,
+	bno : bnoValue,
+	reply : "수정처리 테스트"
+	},function(result){
+		alert("UPDATE");
+	});
+*/
+
+/*
+//댓글 조회처리 테스트
+completion_replyService.get(11,function(data){
+	console.log(data);
+});
+*/
+
+</script>
 
 <!-- script -->
 <script type="text/javascript">
@@ -192,7 +247,7 @@ $(document).ready(function(){
 	//해당 게시물의 첨부파일을 가져오는부분 (가장먼저 동작해야함)
 	(function(){
 		var bno = '<c:out value="${board.bno}"/>';
-		$.getJSON("/notice/getAttachList",{bno:bno},function(arr){
+		$.getJSON("/completion/getAttachList",{bno:bno},function(arr){
 			console.log(arr);
 			var str = "";
 			
@@ -203,7 +258,7 @@ $(document).ready(function(){
 			if(attach.fileType){
 				var fileCallPath = encodeURIComponent(attach.uploadPath+"/s_"+attach.uuid+"_"+attach.fileName);
 				str += "<li data-path='"+attach.uploadPath+"' data-uuid='"+attach.uuid+"' data-filename='"+attach.fileName+"' data-type='"+attach.fileType+"'><div>";
-				str += "<img src='/notice/display?fileName="+fileCallPath+"' class='img-responsive img-thumbnail'>";
+				str += "<img src='/completion/display?fileName="+fileCallPath+"' class='img-responsive img-thumbnail'>";
 				str += "</div>";
 				str += "</li>"
 			}else{
@@ -229,7 +284,7 @@ $(document).ready(function(){
 	 		 showImage(path.replace(new RegExp(/\\/g),"/")); //원본이미지 보여주기
 	 	 }else{
 	 		 //download
-	 		 self.location="/notice/download?fileName="+path
+	 		 self.location="/completion/download?fileName="+path
 	 	 }
 	 });
 	
@@ -237,7 +292,7 @@ $(document).ready(function(){
 	 function showImage(fileCallPath){
 		 //alert(fileCallPath);
 		 $(".bigPictureWrapper").css("display","flex").show();
-		 $(".bigPicture").html("<img src='/notice/display?fileName="+fileCallPath+"'>").animate({width:'100%',height:'100%'},1000);
+		 $(".bigPicture").html("<img src='/completion/display?fileName="+fileCallPath+"'>").animate({width:'100%',height:'100%'},1000);
 		 
 	 }
 	 
@@ -252,13 +307,13 @@ $(document).ready(function(){
 	
 	
 	var bnoValue='<c:out value="${board.bno}"/>';
-	var notice_replyUL = $(".chat");
+	var completion_replyUL = $(".chat");
 	
 	showList(1); //조회목록 가져오게하기위한 함수
 	
 	//게시글 조회시 댓글목록 가져오기위한 함수
 	function showList(page){
-		notice_replyService.getList({bno:bnoValue,page:page||1 } , function(replyCnt,list){
+		completion_replyService.getList({bno:bnoValue,page:page||1 } , function(replyCnt,list){
 			
 			console.log("전체댓글 수:" +replyCnt);
 			console.log("list : " +list)
@@ -274,7 +329,7 @@ $(document).ready(function(){
 			var str = "";
 			
 				if(list == null || list.length == 0){ // list = null 오타때문에 list값이 계속 오류나는 문제발생 해결
-					notice_replyUL.html("");
+					completion_replyUL.html("");
 					return;
 				}			
 				
@@ -282,12 +337,12 @@ $(document).ready(function(){
 				for(var i = 0 ; i < list.length ; i++){
 					str += "<li data-rno="+list[i].rno+"><div><div class='header'>";
 					str += "<strong class='primary-font'>"+list[i].replyer+"</strong>";
-					str += "<small style='float:right'>"+notice_replyService.displayTime(list[i].replyDate)+"</small></div>";
+					str += "<small style='float:right'>"+completion_replyService.displayTime(list[i].replyDate)+"</small></div>";
 					str += "<p>"+list[i].reply+"</p></div></li>";
 					
 				}
 			
-			notice_replyUL.html(str);
+			completion_replyUL.html(str);
 			showReplypage(replyCnt); // 게시글 조회하면서 페이징처리도 할수있도록 추가
 		});
 	}
@@ -338,7 +393,7 @@ $(document).ready(function(){
 				replyer : modalInputReplyer.val(),
 				bno : bnoValue
 			};
-		notice_replyService.add(reply,function(result){
+		completion_replyService.add(reply,function(result){
 			alert(result);
 			
 			modal.find("input").val("");
@@ -354,10 +409,10 @@ $(document).ready(function(){
 	$(".chat").on("click","li",function(e){
 		var rno = $(this).data("rno");
 		console.log(rno);
-		notice_replyService.get(rno,function(reply){
+		completion_replyService.get(rno,function(reply){
 			modalInputReply.val(reply.reply);
 			modalInputReplyer.val(reply.replyer);
-			modalInputReplyDate.val(notice_replyService.displayTime(reply.replyDate)).attr("readonly","readonly");
+			modalInputReplyDate.val(completion_replyService.displayTime(reply.replyDate)).attr("readonly","readonly");
 			modal.data("rno",reply.rno); //data-rno값 처리
 			
 			modal.find("button[id != 'modalCloseBtn']").hide();
@@ -395,7 +450,7 @@ $(document).ready(function(){
 			return;
 		}
 		
-		notice_replyService.update(reply,function(result){
+		completion_replyService.update(reply,function(result){
 			alert(result);
 			modal.modal("hide");
 			//showList(1);
@@ -425,7 +480,7 @@ $(document).ready(function(){
 			return;
 		}
 		
-		notice_replyService.remove(rno,originalReplyer,function(result){
+		completion_replyService.remove(rno,originalReplyer,function(result){
 			alert(result);
 			modal.modal("hide");
 			//showList(1);
@@ -487,18 +542,18 @@ $(document).ready(function(){
 	
 	
 	
-	console.log(notice_replyService);
+	console.log(completion_replyService);
 	
 	var operForm = $('#operForm');
 	
 	//버튼이동 스크립트 (Form)
 	$("button[data-oper='modify']").on("click",function(e){
-		operForm.attr("action","/notice/modify").submit(); //수정페이지로 이동
+		operForm.attr("action","/completion/modify").submit(); //수정페이지로 이동
 	});
 	
 	$("button[data-oper='list']").on("click",function(e){
 		operForm.find("#bno").remove();
-		operForm.attr("action","/notice/list")
+		operForm.attr("action","/completion/list")
 		operForm.submit();  //가지고있던 bno값을 지우고 list로 이동
 	});
 	

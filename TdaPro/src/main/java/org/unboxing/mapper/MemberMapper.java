@@ -1,12 +1,13 @@
 package org.unboxing.mapper;
 
+import org.unboxing.domain.AuthVO;
 import org.unboxing.domain.MemberVO;
 
 public interface MemberMapper {
 	
 	public MemberVO read(String userid);
 	
-	public void register(String userid,String username,String userpw);
+	public void register(MemberVO vo);
 	
-	public void registerAuth(String userid,String Auth);
+	public void registerAuth(AuthVO vo);
 }

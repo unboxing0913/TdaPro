@@ -7,7 +7,7 @@
 		<hr>
 		<h3 class="text-secondary">TS Art Design</h3>
 		<p>
-			ADDRESS. 서울시 노원구 74-7 | ceo. 전태산 | BUSINESS NUMBER.  <span class="text-primary">010 5501 8403</span>
+			ADDRESS. 서울특별시 도봉구 창동 노해로63나길 24 | ceo. 전태산 | BUSINESS NUMBER.  <span class="text-primary">010 5501 8403</span>
 			/ Designed by <span class="text-primary">Min Su</span>
 		</p>
 	</div>

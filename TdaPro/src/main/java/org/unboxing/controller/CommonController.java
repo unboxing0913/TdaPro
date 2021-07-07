@@ -1,16 +1,29 @@
 package org.unboxing.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.unboxing.domain.AuthVO;
+import org.unboxing.domain.MemberVO;
+import org.unboxing.service.MemberService;
 
+import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
 @Controller
 @Log4j
 public class CommonController {
 
+	@Setter(onMethod_=@Autowired)
+	MemberService service;
+	
+	@Setter(onMethod_=@Autowired)
+	BCryptPasswordEncoder pwdEncoder;
 	
 	
 	//접근제한 매핑
@@ -44,9 +57,23 @@ public class CommonController {
 	//회원가입 페이지 매핑
 	@GetMapping("/customSignUp")
 	public void customSignUp() {
-		
+		log.info("회원가입");
 	}
 	
+	//
+	@PreAuthorize("isAnonymous()")
+	@PostMapping("/customSignUp")
+	public String register(MemberVO vo,AuthVO avo) {
 
+		service.register(vo);
+		service.registerAuth(avo);
+		
+		return "redirect:/";
+	}
+	
+	@GetMapping("/maps")
+	public void maps() {
+		
+	}
 	
 }

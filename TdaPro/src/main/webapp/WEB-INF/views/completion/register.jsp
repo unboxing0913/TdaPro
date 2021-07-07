@@ -13,19 +13,16 @@
 <!-- register body -->
 <div class="row">
 	<div class="col-lg-12">
-		<h1>Notice Register Page</h1>
+		<h1>Completion Register Page</h1>
 		<hr>
 	</div>
 </div>
 
 <div class="col-lg-12 col-md-12 col-sm-12">
 	
-	<form role="form" action="/notice/register" method="post">
-	
-		<!-- POST방식이 처리되는 부분이므로 CSRF 토큰 추가 -->
-		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }"/>
-		
-		<div class="from-group">
+	<form role="form" action="/completion/register" method="post">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }"/>
+		<div class="from-group">		
 			<label>제목</label><input class="form-control" name="title">
 		</div>
 		<br>
@@ -146,7 +143,7 @@ $(document).ready(function(e){
 				str += "<path fill-rule='evenodd' d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z'/>";
 				str += "</svg>";
 				str += "</button><br><br>";
-				str += "<img src='/notice/display?fileName="+fileCallPath+"'class='img-responsive img-thumbnail'>";
+				str += "<img src='/completion/display?fileName="+fileCallPath+"'class='img-responsive img-thumbnail'>";
 				str += "</div>";
 				str += "</li>";
 			}else{
@@ -194,11 +191,11 @@ $(document).ready(function(e){
 		
 		//게시물등록 POST처리이기때문에 토큰처리
 		$.ajax({
-			url:'/notice/uploadAjaxAction',
+			url:'/completion/uploadAjaxAction',
 			processData : false,
 			contentType : false,
-			beforeSend : function(xhr){
-				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
+			beforeSend:function(xhr){
+				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue); 
 			},
 			data: formData,
 			type: 'POST',
@@ -222,10 +219,10 @@ $(document).ready(function(e){
 		
 		// 첨부파일 제거 역시 POST  이기때문에 토큰처리
 		$.ajax({
-			url: '/notice/deleteFile',
+			url: '/completion/deleteFile',
 			data : {fileName: targetFile, type: type},
-			beforeSend : function(xhr){
-				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
+			beforeSend:function(xhr){
+				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue); 
 			},
 			dataType:'text',
 			type:'POST',

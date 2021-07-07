@@ -21,6 +21,8 @@
 <div class="col-lg-12 col-md-12 col-sm-12">
 	
 	<form role="form" action="/review/register" method="post">
+	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token }"/>
+	
 		<div class="from-group">
 			<label>제목</label><input class="form-control" name="title">
 		</div>
@@ -169,8 +171,8 @@ $(document).ready(function(e){
 	}
 	
 	//시큐리티처리를 위한 csrf 정보 
-	var csrfHeaderName="${_csrf.headerName}";
-	var csrfTokenValue="${_csrf.token}";
+	var csrfHeaderName = "${_csrf.headerName}";
+	var csrfTokenValue = "${_csrf.token}";
 	
 	//file추가시 검사
 	$("input[type='file']").change(function(e){
@@ -193,8 +195,8 @@ $(document).ready(function(e){
 			url:'/review/uploadAjaxAction',
 			processData : false,
 			contentType : false,
-			beforSend:function(xhr){
-				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue); // CSRF토큰 값을 전달
+			beforeSend : function(xhr){
+				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
 			},
 			data: formData,
 			type: 'POST',
@@ -220,8 +222,8 @@ $(document).ready(function(e){
 		$.ajax({
 			url: '/review/deleteFile',
 			data : {fileName: targetFile, type: type},
-			beforSend:function(xhr){
-				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue); // CSRF토큰 값을 전달
+			beforeSend : function(xhr){
+				xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
 			},
 			dataType:'text',
 			type:'POST',

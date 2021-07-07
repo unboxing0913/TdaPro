@@ -7,8 +7,8 @@
 		<!-- scurity 버전 지워줌 (네임스페이스 5.0 시 문제발생) -->
 		
 		
-		<!-- 접근제한 핸들러 빈 -->
-		<bean id="customAccessDenied" class="org.unboxing.security.CustomAccessDeniedHandler"></bean>
+		<!-- 접근제한 핸들러 빈
+		<bean id="customAccessDenied" class="org.unboxing.security.CustomAccessDeniedHandler"></bean> -->
 		
 		<!-- 로그인성공후 담당 핸들러 빈 
 		<bean id="customLoginSuccess" class="org.unboxing.security.CustomLoginSuccessHandler"></bean>-->
@@ -27,8 +27,9 @@
 			<security:intercept-url pattern="/sample/member" access="hasRole('ROLE_MEMBER')"/>
 			<security:intercept-url pattern="/sample/admin" access="hasRole('ROLE_ADMIN')"/> -->
 			
+			
 			<!--접근제한 메시지 처리  -->		    
-			<security:access-denied-handler ref="customAccessDenied"/> <!-- 접근제한 핸들러구현 -->
+		<!--	<security:access-denied-handler ref="customAccessDenied"/>  접근제한 핸들러구현 -->
 				
 			<!--로그인 페이지 설정 -->
 			<security:form-login login-page="/customLogin"/> 

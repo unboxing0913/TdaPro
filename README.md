@@ -917,3 +917,106 @@ ReviewController의 Upload 관련된 매핑 메소드안에 로그인한 사용�
 
 ※간단한 회원가입처리를 만드려했으나 권한오류가 발생	
 	
+
+■■■■■■■■■■■■■■■2021-07-07■■■■■■■■■■■■■■■
+※간단한 회원가입처리를 만드려했으나 권한오류가 발생
+
+아주간단한 회원가입처리
+----> csrf 토큰을 추가해줌
+----> controller에서 service로 보내는 매개변수를 VO로 설정 ( MemberVO,AutoVO )
+----> security필터 재설정 (한글문제)
+----> 회원가입 되는것 확인 (현재 가입한 아이디로 로그인 성공까지 확인)
+
+
+Notice (공지사항과 관련된 데이터베이스 테이블 생성,권한설정)
+create sequence nt_seq_board;
+
+create table notice_board(
+    bno number(10,0),
+    title varchar2(200) not null,
+    content varchar2(2000) not null,
+    writer varchar2(50) not null,
+    regdate date default sysdate,
+    updatedate date default sysdate
+    );
+
+alter table notice_board add constraint pk_notice_board primary key(bno);
+alter table notice_board add(replycnt number default 0);
+
+create table nt_reply(
+    rno number(10,0),
+    bno number(10,0) not null,
+    reply varchar2(1000) not null,
+    replyer varchar2(50) not null,
+    replyDate date default sysdate,
+    updateDate date default sysdate
+ );
+
+create sequence nt_seq_reply;
+
+alter table nt_reply add constraint pk_nt_reply primary key (rno);
+
+alter table nt_reply add constraint fk_notice_reply foreign key (bno) references notice_board(bno);
+
+create table notice_attach(
+	uuid varchar2(100) not null,
+	uploadPath varchar2(200) not null,
+	fileName varchar2(100) not null,
+	filetype char(1) default 'I',
+	bno number(10,0)
+);
+
+alter table notice_attach add constraint pk_nt_attach primary key(uuid);
+alter table notice_attach add constraint fk_nt_attach foreign key(bno) references notice_board(bno);
+
+완공게시판과 관련된 데이터베이스 테이블,권한설정
+
+create sequence cp_seq_board;
+
+create table completion_board(
+    bno number(10,0),
+    title varchar2(200) not null,
+    content varchar2(2000) not null,
+    writer varchar2(50) not null,
+    regdate date default sysdate,
+    updatedate date default sysdate
+    );
+
+alter table completion_board add constraint pk_completion_board primary key(bno);
+alter table completion_board add(replycnt number default 0);
+
+create table cp_reply(
+    rno number(10,0),
+    bno number(10,0) not null,
+    reply varchar2(1000) not null,
+    replyer varchar2(50) not null,
+    replyDate date default sysdate,
+    updateDate date default sysdate
+ );
+
+create sequence cp_seq_reply;
+
+alter table cp_reply add constraint pk_cp_reply primary key (rno);
+
+alter table cp_reply add constraint fk_completion_reply foreign key (bno) references completion_board(bno);
+
+create table completion_attach(
+	uuid varchar2(100) not null,
+	uploadPath varchar2(200) not null,
+	fileName varchar2(100) not null,
+	filetype char(1) default 'I',
+	bno number(10,0)
+);
+
+alter table completion_attach add constraint pk_cp_attach primary key(uuid);
+alter table completion_attach add constraint fk_cp_attach foreign key(bno) references completion_board(bno);
+
+
+
+
+
+공지사항과 완공게시판 데이터 테이블 만든후 컨트롤러 , 서비스 , VO , 매퍼 처리 
+----> 기존에 처음만들었던 review게시판과 동일 ( 매핑주소와 클래스, 매퍼의 테이블 만 다름 )
+
+오시는길
+---> google iframe을 사용 
